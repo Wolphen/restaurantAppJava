@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="fr.restaurant.controller.RootController"
+            fx:id="root"
+            prefWidth="1000.0" prefHeight="650.0">
+
+    <!--  Barre du haut  -->
+    <top>
+        <ToolBar>
+            <Label text="Restaurant Manager" styleClass="title"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <!-- Boutons de navigation -->
+            <Button text="Dashboard"  onAction="#openDashboard"/>
+            <Button text="Plats"      onAction="#openDishes"/>
+            <Button text="Commandes"  onAction="#openOrders"/>
+            <Button text="Tables"     onAction="#openTables"/>
+            <Button text="Employés"   onAction="#openEmployees"/>
+            <Button text="Finances"   onAction="#openFinances"/>
+            <Pane minWidth="20"/>
+            <!-- Chronomètre global -->
+            <Label fx:id="timerLabel" text="25:00" styleClass="timer"/>
+        </ToolBar>
+    </top>
+
+    <!--  Contenu central - -->
+    <center>
+        <!-- Bandeau d’onglets masqué au public : navigation via les boutons -->
+        <TabPane fx:id="mainTabPane"
+                 tabClosingPolicy="UNAVAILABLE"
+                 tabMaxHeight="0">
+            <!-- ça veut dire que c'est cacher  -->
+            <tabs>
+
+                <!-- Dashboard -->
+                <Tab fx:id="dashboardTab" text="Dashboard" closable="false">
+                    <content>
+                        <VBox alignment="CENTER" spacing="12">
+                            <Label text="Dashboard" styleClass="tabTitle"/>
+                            <Label text="Vue synthèse : stats et files d’attente."/>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <!-- Plats -->
+                <Tab fx:id="dishesTab" text="Plats" closable="false"/>
+
+
+                <!-- Commandes -->
+                <Tab fx:id="ordersTab" text="Commandes" closable="false">
+                    <content>
+                        <VBox alignment="CENTER" spacing="12">
+                            <Label text="Commandes" styleClass="tabTitle"/>
+                            <Label text="Suivi et préparation des commandes."/>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <!-- Tables -->
+                <Tab fx:id="tablesTab" text="Tables" closable="false">
+                    <content>
+                        <VBox alignment="CENTER" spacing="12">
+                            <Label text="Tables" styleClass="tabTitle"/>
+                            <Label text="Gestion des tables du restaurant."/>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <!-- Employés -->
+                <Tab fx:id="employeesTab" text="Employés" closable="false">
+                    <content>
+                        <VBox alignment="CENTER" spacing="12">
+                            <Label text="Employés" styleClass="tabTitle"/>
+                            <Label text="Fiches et pointage des employés."/>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <!-- Finances -->
+                <Tab fx:id="financesTab" text="Finances" closable="false">
+                    <content>
+                        <VBox alignment="CENTER" spacing="12">
+                            <Label text="Finances" styleClass="tabTitle"/>
+                            <Label text="Recettes, dépenses, export PDF."/>
+                        </VBox>
+                    </content>
+                </Tab>
+
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

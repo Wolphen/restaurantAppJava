@@ -1,0 +1,43 @@
+/* ===== Couleurs de base ===== */
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-base: #ffffff;
+}
+
+.tool-bar {
+    -fx-background-color: linear-gradient(to right, #3949ab, #5c6bc0);
+    -fx-padding: 8 10 8 10;
+}
+
+.title {
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-radius: 8;
+    -fx-background-color: #ffffff22;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.button:hover {
+    -fx-background-color: #ffffff55;
+}
+
+.timer {
+    -fx-font-size: 18px;
+    -fx-text-fill: #ffeb3b;
+    -fx-font-weight: bold;
+}
+
+.welcome {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.tabTitle {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
