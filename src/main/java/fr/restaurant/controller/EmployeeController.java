@@ -29,6 +29,9 @@ public class EmployeeController {
     @FXML private TableColumn<Employee, Void> deleteCol;
     @FXML private TableColumn<Employee, Void> addHourCol;
 
+
+    SqliteController sqliteController = new SqliteController();
+
     private final ObservableList<Employee> data = FXCollections.observableArrayList(
             new Employee(30, 50, "Caissier", "Jean"),
             new Employee(20, 60, "Cuisinier", "Théo"),
@@ -148,7 +151,11 @@ public class EmployeeController {
 
         try {
             int age = Integer.parseInt(ageField.getText());
-            data.add(new Employee(age, 0, postField.getText(), nameField.getText()));
+            Employee employee = new Employee(age, 0, postField.getText(), nameField.getText());
+            data.add(employee);
+            // ajout en bdd
+            sqliteController.addEmployee(employee);
+
             nameField.clear();
             postField.clear();
             ageField.clear();
