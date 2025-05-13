@@ -66,6 +66,14 @@ public class RootController {
     @FXML
     private void openTables() {
         System.out.println(" Ouverture onglet Tables");
+        var url = getClass().getResource("/fr/restaurant/view/DishView.fxml");
+        System.out.println("URL DishView = " + url);
+
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
 
         selectAndLoad(tablesTab, "/fr/restaurant/view/TableView.fxml");
     }

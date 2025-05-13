@@ -61,14 +61,8 @@
                 </Tab>
 
                 <!-- Tables -->
-                <Tab fx:id="tablesTab" text="Tables" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Tables" styleClass="tabTitle"/>
-                            <Label text="Gestion des tables du restaurant."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="tablesTab" text="Tables" closable="false"/>
+
 
                 <!-- Employés -->
                 <Tab fx:id="employeesTab"  text="Employés"   closable="false"/>
