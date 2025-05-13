@@ -1,59 +1,55 @@
 package fr.restaurant.controller;
 
-import fr.restaurant.model.Dish;
 import fr.restaurant.model.Employee;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.collections.ListChangeListener;
-import javafx.collections.transformation.SortedList;
-import org.w3c.dom.ls.LSOutput;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EmployeeController {
 
-    @FXML
-    private TableView<Employee> employeeTable;
+    // injections FXML
+    @FXML private TableView<Employee> employeeTable;
+    @FXML private TableColumn<Employee,String> nameCol;
+    @FXML private TableColumn<Employee,Integer> ageCol;
+    @FXML private TableColumn<Employee,String> postCol;
+    @FXML private TableColumn<Employee,Double> hoursCol;
 
-    @FXML
-    private TableColumn<Employee, String> nameCol;
-    @FXML
-    private TableColumn<Employee, Double> priceCol;
-    @FXML
-    private TableColumn<Employee, String> catCol;
-    @FXML
-    private TableColumn<Employee, String> ingCol;
-
-
-    private ObservableList<Employee> employees = FXCollections.observableArrayList(
-            new Employee(30, 50, "kasier", "Jean"),
-            new Employee(20, 60, "cuisinier", "Theo"),
-            new Employee(60, 90, "serveur", "François")
+    // données démo
+    private final ObservableList<Employee> data = FXCollections.observableArrayList(
+            new Employee(30, 50, "Caissier",  "Jean"),
+            new Employee(20, 60, "Cuisinier", "Théo"),
+            new Employee(60, 90, "Serveur",  "François")
     );
+
     @FXML
     private void initialize() {
 
-        // liaison des colonnes
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("age"));
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("hours"));
-        catCol.setCellValueFactory(new PropertyValueFactory<>("post"));
-        ingCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        System.out.println("employees: " + employees);
-        System.out.println(nameCol);
-    }
+        // liaisons colonne -> getter
+        nameCol .setCellValueFactory(new PropertyValueFactory<>("name"));
+        ageCol  .setCellValueFactory(new PropertyValueFactory<>("age"));
+        postCol .setCellValueFactory(new PropertyValueFactory<>("post"));
+        hoursCol.setCellValueFactory(new PropertyValueFactory<>("hours"));
 
-    public TableView<Employee> getEmployeeTable() {
-        return employeeTable;
-    }
+        // SortedList pour activer le tri au clic
+        FilteredList<Employee> filtered = new FilteredList<>(data, e -> true);
+        SortedList<Employee>   sorted   = new SortedList<>(filtered);
+        sorted.comparatorProperty().bind(employeeTable.comparatorProperty());
+        employeeTable.setItems(sorted);
 
-    public void setEmployeeTable(TableView<Employee> employeeTable) {
-        this.employeeTable = employeeTable;
+        // on force un tri mono-colonne
+        employeeTable.getSortOrder().addListener(
+                (ListChangeListener<TableColumn<Employee, ?>>) c -> {
+                    var order = employeeTable.getSortOrder();
+                    if (order.size() > 1) {
+                        TableColumn<Employee, ?> last = order.get(order.size() - 1);
+                        order.clear();
+                        order.add(last);
+                    }
+                });
     }
 }
-

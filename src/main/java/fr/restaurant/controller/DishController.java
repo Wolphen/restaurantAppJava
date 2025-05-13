@@ -22,8 +22,8 @@ public class DishController {
     @FXML private TableColumn<Dish,String>  nameCol;
     @FXML private TableColumn<Dish,Double>  priceCol;
     @FXML private TableColumn<Dish,String>  catCol;
-    @FXML private TableColumn<Dish,String>  ingCol;     // liste d’ingrédients
-    @FXML private TableColumn<Dish,Integer> countCol;   // nombre d’ingrédients
+    @FXML private TableColumn<Dish,String>  ingCol;
+    @FXML private TableColumn<Dish,Integer> countCol;
 
     @FXML private TextField nameField;
     @FXML private TextField priceField;

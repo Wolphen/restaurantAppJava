@@ -81,7 +81,7 @@ public class RootController {
             return;
         }
 
-        selectAndLoad(dishesTab, "/fr/restaurant/view/EmployeeView.fxml");
+        selectAndLoad(employeesTab, "/fr/restaurant/view/EmployeeView.fxml");
     }
 
 

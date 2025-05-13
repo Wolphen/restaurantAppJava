@@ -5,15 +5,15 @@
 
 <VBox spacing="14" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.restaurant.controller.EmployeeController">
 
-    <Label styleClass="tabTitle" text="Gestion des employés" />
+    <Label text="Gestion des employés" styleClass="tabTitle"/>
 
     <!-- Tableau des plats -->
-    <TableView fx:id="employeeTable" prefHeight="350">
+    <TableView fx:id="employeeTable">
         <columns>
-            <TableColumn fx:id="nameCol" prefWidth="100" text="Nom" />
-            <TableColumn fx:id="priceCol" prefWidth="100" text="Prix €" />
-            <TableColumn fx:id="catCol" prefWidth="100" text="Catégorie" />
-            <TableColumn fx:id="ingCol" prefWidth="100" text="Ingrédients" />
+            <TableColumn fx:id="nameCol"  text="Nom"      prefWidth="140"/>
+            <TableColumn fx:id="ageCol"   text="Âge"      prefWidth="60"/>
+            <TableColumn fx:id="postCol"  text="Poste"    prefWidth="120"/>
+            <TableColumn fx:id="hoursCol" text="Heures"   prefWidth="80"/>
         </columns>
     </TableView>
 

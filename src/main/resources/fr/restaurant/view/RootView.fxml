@@ -71,14 +71,8 @@
                 </Tab>
 
                 <!-- Employés -->
-                <Tab fx:id="employeesTab" text="Employés" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Employés" styleClass="tabTitle"/>
-                            <Label text="Fiches et pointage des employés."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="employeesTab"  text="Employés"   closable="false"/>
+
 
                 <!-- Finances -->
                 <Tab fx:id="financesTab" text="Finances" closable="false">
