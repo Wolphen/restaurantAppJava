@@ -45,10 +45,10 @@ public class DishController {
     private void initialize() {
 
         // liaison des colonnes
-        nameCol .setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        catCol  .setCellValueFactory(new PropertyValueFactory<>("category"));
-        ingCol  .setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
+        catCol.setCellValueFactory(new PropertyValueFactory<>("category"));
+        ingCol.setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
         countCol.setCellValueFactory(new PropertyValueFactory<>("ingredientCount"));
 
         // FilteredList pour la recherche

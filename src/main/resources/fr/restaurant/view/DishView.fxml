@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.*?>
+
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="fr.restaurant.controller.DishController"
-      spacing="14"
-      style="-fx-padding: 20;">
+<VBox spacing="14" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.restaurant.controller.DishController">
 
-    <Label text="Gestion des plats" styleClass="tabTitle"/>
+    <Label styleClass="tabTitle" text="Gestion des plats" />
 
     <!-- Tableau des plats -->
     <TableView fx:id="dishTable" prefHeight="350">
         <columns>
-            <TableColumn fx:id="nameCol"   text="Nom"          prefWidth="180"/>
-            <TableColumn fx:id="priceCol"  text="Prix €"       prefWidth="70"/>
-            <TableColumn fx:id="catCol"    text="Catégorie"    prefWidth="120"/>
-            <TableColumn fx:id="ingCol"    text="Ingrédients"  prefWidth="300"/>
-            <TableColumn fx:id="countCol"  text="# Ingr."      prefWidth="70"/>
+            <TableColumn fx:id="nameCol" prefWidth="180" text="Nom" />
+            <TableColumn fx:id="priceCol" prefWidth="70" text="Prix €" />
+            <TableColumn fx:id="catCol" prefWidth="120" text="Catégorie" />
+            <TableColumn fx:id="ingCol" prefWidth="300" text="Ingrédients" />
+            <TableColumn fx:id="countCol" prefWidth="70" text="Nb Ingr" />
         </columns>
     </TableView>
 
 
     <!-- Ligne d’ajout + recherche -->
     <HBox spacing="8">
-        <TextField fx:id="nameField"     promptText="Nom"/>
-        <TextField fx:id="priceField"    promptText="Prix"/>
-        <TextField fx:id="ingField"      promptText="Ingrédients (virgules)"/>
-        <Button    text="Ajouter"        onAction="#onAdd"/>
-        <Pane HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="searchField"   promptText="Recherche ingrédient…"/>
+        <TextField fx:id="nameField" promptText="Nom" />
+        <TextField fx:id="priceField" promptText="Prix" />
+        <TextField fx:id="ingField" promptText="Ingrédients (virgules)" />
+        <Button fx:id="buttonAdd" onAction="#onAdd" text="Ajouter" />
+        <Pane HBox.hgrow="ALWAYS" />
+        <TextField fx:id="searchField" promptText="Recherche ingrédient…" />
     </HBox>
 </VBox>
