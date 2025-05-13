@@ -31,14 +31,7 @@ public class SqliteController {
 //            statement.executeUpdate("insert into orders values('attente', 'table1', 1)");
 //            statement.executeUpdate("insert into orders values('cancel', 'table2', 2)");
 
-            System.out.println("Table created");
-//            ResultSet rs = statement.executeQuery("select * from orders as ord join dish as dish on ord.dish_id = dish.rowid ");
-            ResultSet rs = statement.executeQuery("select * from orders");
-            System.out.println(rs);
-            while(rs.next())
-            {
-                System.out.println("rowid = " + rs.getInt("id"));
-            }
+            System.out.println("Les tables ont été crées");
         }
         catch(SQLException e)
         {

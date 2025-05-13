@@ -32,6 +32,8 @@ public class DishController {
     @FXML private TextField searchField;
 
     // donnée de test
+    SqliteController sqliteController = new SqliteController();
+
     private final ObservableList<Dish> data = FXCollections.observableArrayList(
             new Dish("Pizza Margherita", 12.5, "Italien",
                     List.of("tomate", "mozzarella", "basilic")),
@@ -101,7 +103,12 @@ public class DishController {
                     .filter(s -> !s.isEmpty())
                     .collect(Collectors.toList());
 
-            data.add(new Dish(nameField.getText(), price, "Autre", ings));
+            Dish dish = new Dish(nameField.getText(), price, "Autre", ings);
+
+            data.add(dish);
+
+            // ajout en bdd
+            sqliteController.addDish(dish);
 
             nameField.clear(); priceField.clear(); ingField.clear();
         } catch (NumberFormatException ex) {
