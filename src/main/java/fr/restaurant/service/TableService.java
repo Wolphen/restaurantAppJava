@@ -1,53 +1,65 @@
 package fr.restaurant.service;
 
+import fr.restaurant.controller.SqliteController;
 import fr.restaurant.model.Table;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * le boss des tables : stocke une liste observable et parle à sqlite.
+ */
 public class TableService {
 
-    private List<Table> tables;
+    private final SqliteController db = new SqliteController();
 
-    public TableService() {
-        this.tables = new ArrayList<>();
+    // liste qui se met à jour toute seule dans les vues
+    private final ObservableList<Table> tables =
+            FXCollections.observableArrayList(db.fetchTables());
+
+    /* accès lecture – les contrôleurs l’utilisent directement */
+    public ObservableList<Table> getTables() { return tables; }
+
+    // ajoute une table (et la persiste)
+    public void addTable(Table t) {
+        db.addTable(t);
+        tables.add(t);
     }
 
-    public void addTable(Table table) {
-        tables.add(table);
-    }
-
+    // renvoie uniquement les tables libres
     public List<Table> listAvailableTables() {
-        List<Table> available = new ArrayList<>();
-        for (Table table : tables) {
-            if (!table.isOccupied()) {
-                available.add(table);
-            }
-        }
-        return available;
+        return tables.stream()
+                .filter(t -> !t.isOccupied())
+                .collect(Collectors.toList());
     }
 
-    public boolean assignTable(int tableId) {
-        for (Table table : tables) {
-            if (table.getId() == tableId && !table.isOccupied()) {
-                table.setOccupied(true);
-                return true;
-            }
-        }
-        return false;
+    // tente d’occuper une table – true si succès
+    public boolean assignTable(int id) {
+        return changeStatus(id, true);
     }
 
-    public boolean freeTable(int tableId) {
-        for (Table table : tables) {
-            if (table.getId() == tableId && table.isOccupied()) {
-                table.setOccupied(false);
-                return true;
-            }
-        }
-        return false;
+    // libère une table – true si succès
+    public boolean freeTable(int id) {
+        return changeStatus(id, false);
     }
 
+    // juste un raccourci pour avoir une copie
     public List<Table> listAllTables() {
-        return new ArrayList<>(tables);
+        return List.copyOf(tables);
+    }
+
+    // implémentation commune
+    private boolean changeStatus(int id, boolean occ) {
+        for (Table t : tables) {
+            if (t.getId() == id) {
+                if (t.isOccupied() == occ) return false;   // déjà dans le bon état
+                t.setOccupied(occ);
+                db.updateTableStatus(id, occ);
+                return true;
+            }
+        }
+        return false; // id inconnu
     }
 }

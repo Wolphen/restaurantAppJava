@@ -11,25 +11,32 @@
 
     <TableView fx:id="dishTable" prefHeight="330">
         <columns>
-            <TableColumn fx:id="imgCol"   text=""           prefWidth="50"/>
-            <TableColumn fx:id="nameCol"  text="Nom"        prefWidth="140"/>
-            <TableColumn fx:id="priceCol" text="Prix €"     prefWidth="70"/>
-            <TableColumn fx:id="descCol"  text="Description" prefWidth="220"/>
-            <TableColumn fx:id="ingCol" text="Ingrédients" prefWidth="200"/>
-            <TableColumn fx:id="countCol" text="# Ingr."    prefWidth="60"/>
-            <TableColumn fx:id="deleteCol" text=""          prefWidth="90"/>
+            <TableColumn fx:id="imgCol"   text=""            prefWidth="50"
+                         style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="nameCol"  text="Nom"         prefWidth="140"
+                         style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="priceCol" text="Prix €"      prefWidth="70"
+                         style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="descCol"  text="Description" prefWidth="220"
+                         style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="ingCol"   text="Ingrédients" prefWidth="200"
+                         style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="countCol" text="# Ingr."     prefWidth="60"
+                         style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="deleteCol" text=""           prefWidth="90"
+                         style="-fx-alignment: CENTER;"/>
         </columns>
     </TableView>
 
     <!-- Barre d’ajout -->
     <HBox spacing="8">
-        <TextField fx:id="nameField"  promptText="Nom"/>
-        <TextField fx:id="priceField" promptText="Prix"/>
+        <TextField fx:id="nameField" prefWidth="60" promptText="Nom"/>
+        <TextField fx:id="priceField" prefWidth="60" promptText="Prix"/>
         <TextField fx:id="descField"  promptText="Description"/>
-        <Button    fx:id="chooseImgBtn" text="Choisir image" onAction="#chooseImage"/>
-        <Label     fx:id="chosenImgLabel" text="" minWidth="80"/>
+        <Button   id="buttonAdd" fx:id="chooseImgBtn" text="Choisir image" onAction="#chooseImage"/>
+        <Label     fx:id="chosenImgLabel" text="" prefWidth="80"/>
         <TextField fx:id="ingField"   promptText="Ingrédients (virgules)"/>
-        <Button    text="Ajouter" onAction="#onAdd"/>
+        <Button  id="buttonAdd"  text="Ajouter" onAction="#onAdd"/>
         <Pane HBox.hgrow="ALWAYS"/>
         <TextField fx:id="searchField" promptText="Recherche ingrédient…"/>
     </HBox>

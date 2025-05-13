@@ -25,11 +25,11 @@
     <HBox spacing="10">
         <TextField fx:id="idField" promptText="Numéro de la table" />
         <TextField fx:id="sizeField" promptText="Nombre de place" />
-        <Button text="Ajouter une table" onAction="#onAddTable" />
+        <Button id="buttonAdd" text="Ajouter une table" onAction="#onAddTable" />
     </HBox>
 
     <HBox spacing="10">
-        <Button text="Assigner la table" onAction="#onAssignTable" />
-        <Button text="Libérer la table" onAction="#onFreeTable" />
+        <Button id="buttonAdd" text="Assigner la table" onAction="#onAssignTable" />
+        <Button id="buttonAdd" text="Libérer la table" onAction="#onFreeTable" />
     </HBox>
 </VBox>
