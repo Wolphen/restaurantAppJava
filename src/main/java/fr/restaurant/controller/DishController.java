@@ -23,8 +23,8 @@ public class DishController {
     @FXML private TableColumn<Dish,String>  nameCol;
     @FXML private TableColumn<Dish,Double>  priceCol;
     @FXML private TableColumn<Dish,String>  catCol;
-    @FXML private TableColumn<Dish,String>  ingCol;     // liste d’ingrédients
-    @FXML private TableColumn<Dish,Integer> countCol;   // nombre d’ingrédients
+    @FXML private TableColumn<Dish,String>  ingCol;
+    @FXML private TableColumn<Dish,Integer> countCol;
 
     @FXML private TextField nameField;
     @FXML private TextField priceField;
@@ -48,10 +48,10 @@ public class DishController {
     private void initialize() {
 
         // liaison des colonnes
-        nameCol .setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        catCol  .setCellValueFactory(new PropertyValueFactory<>("category"));
-        ingCol  .setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
+        catCol.setCellValueFactory(new PropertyValueFactory<>("category"));
+        ingCol.setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
         countCol.setCellValueFactory(new PropertyValueFactory<>("ingredientCount"));
 
         // FilteredList pour la recherche
@@ -74,7 +74,7 @@ public class DishController {
                     }
                 });
 
-        /* 5. recherche par ingrédient (inchangé) */
+        //  recherche par ingrédient
         searchField.textProperty().addListener((obs, o, n) -> {
             List<String> terms = Arrays.stream(n.toLowerCase().trim().split("\\s+"))
                     .filter(s -> !s.isBlank())

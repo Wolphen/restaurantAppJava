@@ -72,10 +72,18 @@ public class RootController {
 
     @FXML
     private void openEmployees() {
-        System.out.println(" Ouverture onglet Employees");
+        var url = getClass().getResource("/fr/restaurant/view/EmployeeView.fxml");
+        System.out.println("URL Employee = " + url);
+
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
 
         selectAndLoad(employeesTab, "/fr/restaurant/view/EmployeeView.fxml");
     }
+
 
     @FXML
     private void openFinances() {
@@ -91,7 +99,9 @@ public class RootController {
         /* Charge une seule fois */
         if (tab.getContent() == null) {
             try {
-                System.out.println(" erreur tab : " + fxmlPath);
+                IOException exception = new IOException("FXML introuvable : " + fxmlPath);
+               exception.fillInStackTrace();
+                System.out.println(exception);
                 Node content = FXMLLoader.load(getClass().getResource(fxmlPath));
                 tab.setContent(content);
             } catch (IOException ex) {

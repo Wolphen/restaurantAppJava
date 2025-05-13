@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.restaurant.controller.EmployeeController">
+
+    <Label styleClass="tabTitle" text="Gestion des employés" />
+
+    <TableView fx:id="employeeTable" prefHeight="330">
+        <columns>
+            <TableColumn fx:id="nameCol" prefWidth="140" text="Nom" />
+            <TableColumn fx:id="ageCol" prefWidth="60" text="Âge" />
+            <TableColumn fx:id="postCol" prefWidth="120" text="Poste" />
+            <TableColumn fx:id="hoursCol" prefWidth="80" text="Heures" />
+            <TableColumn fx:id="deleteCol" prefWidth="100" text="Supprimer">
+            </TableColumn>
+            <TableColumn fx:id="addHourCol" prefWidth="140" text="Ajoutez des heures">
+            </TableColumn>
+        </columns>
+    </TableView>
+    <HBox spacing="8">
+        <TextField fx:id="nameField" promptText="Nom" />
+        <TextField fx:id="ageField" promptText="Age" />
+        <TextField fx:id="postField" promptText="Poste" />
+        <Button fx:id="buttonAdd" onAction="#onAdd" text="Ajouter" />
+        <Label text="Recherche prénom :" />
+        <TextField fx:id="searchField" promptText="Entrez un prénom…" />
+    </HBox>
+</VBox>
