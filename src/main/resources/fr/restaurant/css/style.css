@@ -15,9 +15,15 @@
     -fx-font-weight: bold;
 }
 
-.button {
+#buttonTab {
     -fx-background-radius: 8;
     -fx-background-color: #ffffff22;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+#buttonAdd {
+    -fx-background-radius: 8;
+    -fx-background-color: linear-gradient(to right, #3949ab, #5c6bc0);
     -fx-text-fill: white;
     -fx-font-size: 14px;
 }

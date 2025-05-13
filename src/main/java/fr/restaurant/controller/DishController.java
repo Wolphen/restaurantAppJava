@@ -1,7 +1,6 @@
 package fr.restaurant.controller;
 
 import fr.restaurant.model.Dish;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -22,8 +21,8 @@ public class DishController {
     @FXML private TableColumn<Dish,String>  nameCol;
     @FXML private TableColumn<Dish,Double>  priceCol;
     @FXML private TableColumn<Dish,String>  catCol;
-    @FXML private TableColumn<Dish,String>  ingCol;     // liste d’ingrédients
-    @FXML private TableColumn<Dish,Integer> countCol;   // nombre d’ingrédients
+    @FXML private TableColumn<Dish,String>  ingCol;
+    @FXML private TableColumn<Dish,Integer> countCol;
 
     @FXML private TextField nameField;
     @FXML private TextField priceField;
@@ -31,26 +30,24 @@ public class DishController {
     @FXML private TextField searchField;
 
     // donnée de test
-    private final ObservableList<Dish> data = FXCollections.observableArrayList(
-            new Dish("Pizza Margherita", 12.5, "Italien",
-                    List.of("tomate", "mozzarella", "basilic")),
-            new Dish("Burger Maison", 9.9, "Américain",
-                    List.of("bœuf", "salade", "tomate", "cheddar")),
-            new Dish("Curry Veggie", 11.0, "Indien",
-                    List.of("pois chiches", "curry", "lait de coco"))
-    );
+    SqliteController sqliteController = new SqliteController();
+
+
+    private final ObservableList<Dish> data = sqliteController.fetchDish();
 
     /* ---------- initialisation ---------- */
     @FXML
     private void initialize() {
 
         // liaison des colonnes
-        nameCol .setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        catCol  .setCellValueFactory(new PropertyValueFactory<>("category"));
-        ingCol  .setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
+        catCol.setCellValueFactory(new PropertyValueFactory<>("category"));
+        ingCol.setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
         countCol.setCellValueFactory(new PropertyValueFactory<>("ingredientCount"));
 
+        System.out.println("Je suis la data");
+        System.out.println(data);
         // FilteredList pour la recherche
         FilteredList<Dish> filtered = new FilteredList<>(data, d -> true);
 
@@ -71,7 +68,7 @@ public class DishController {
                     }
                 });
 
-        /* 5. recherche par ingrédient (inchangé) */
+        //  recherche par ingrédient
         searchField.textProperty().addListener((obs, o, n) -> {
             List<String> terms = Arrays.stream(n.toLowerCase().trim().split("\\s+"))
                     .filter(s -> !s.isBlank())
@@ -100,7 +97,12 @@ public class DishController {
                     .filter(s -> !s.isEmpty())
                     .collect(Collectors.toList());
 
-            data.add(new Dish(nameField.getText(), price, "Autre", ings));
+            Dish dish = new Dish(nameField.getText(), price, "Autre", ings);
+
+            data.add(dish);
+
+            // ajout en bdd
+            sqliteController.addDish(dish);
 
             nameField.clear(); priceField.clear(); ingField.clear();
         } catch (NumberFormatException ex) {

@@ -19,7 +19,7 @@ public class Dish {
 
     /* getters / setters */
 
-    public int getIngredientCount() {      // utilisé pour trier la colonne #
+    public int getIngredientCount() {        // utilisé pour trier la colonne #
         return ingredients.size();
     }
 
@@ -38,4 +38,5 @@ public class Dish {
     public String getIngredientsString() {
         return String.join(", ", ingredients);
     }
+
 }

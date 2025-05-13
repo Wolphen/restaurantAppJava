@@ -1,9 +1,12 @@
 package fr.restaurant;
 
+import fr.restaurant.controller.SqliteController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.sql.*;
 
 public class Main extends Application {
     @Override
@@ -16,9 +19,17 @@ public class Main extends Application {
 
         stage.setTitle("Restaurant Manager");
         stage.setScene(scene);
-        stage.setMinWidth(900);   // évite de trop rétrécir
+        stage.setMinWidth(900);
         stage.setMinHeight(600);
         stage.show();
     }
-    public static void main(String[] args) { launch(args); }
+    public static void main(String[] args) {
+        // création des tables
+        SqliteController bdd = new SqliteController();
+        bdd.creationTable();
+
+        launch(args);
+
+
+    }
 }

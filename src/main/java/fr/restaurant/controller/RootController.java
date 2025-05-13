@@ -1,5 +1,7 @@
 package fr.restaurant.controller;
 
+import fr.restaurant.Utils.Chronometer;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -8,6 +10,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 import java.io.IOException;
+
+
 
 /** Contrôleur principal : gère la barre de navigation et l’affichage des onglets */
 public class RootController {
@@ -27,10 +31,8 @@ public class RootController {
     @FXML
     private void initialize() {
         mainTabPane.setTabMaxHeight(0);
-
-        /* TODO : lancer ici le vrai chrono si possible avec un thread */
-        timerLabel.setText("25:00");
     }
+
 
 
     @FXML
@@ -66,16 +68,32 @@ public class RootController {
     @FXML
     private void openTables() {
         System.out.println(" Ouverture onglet Tables");
+        var url = getClass().getResource("/fr/restaurant/view/DishView.fxml");
+        System.out.println("URL DishView = " + url);
+
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
 
         selectAndLoad(tablesTab, "/fr/restaurant/view/TableView.fxml");
     }
 
     @FXML
     private void openEmployees() {
-        System.out.println(" Ouverture onglet Employees");
+        var url = getClass().getResource("/fr/restaurant/view/EmployeeView.fxml");
+        System.out.println("URL Employee = " + url);
+
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
 
         selectAndLoad(employeesTab, "/fr/restaurant/view/EmployeeView.fxml");
     }
+
 
     @FXML
     private void openFinances() {
@@ -91,7 +109,9 @@ public class RootController {
         /* Charge une seule fois */
         if (tab.getContent() == null) {
             try {
-                System.out.println(" erreur tab : " + fxmlPath);
+                IOException exception = new IOException("FXML introuvable : " + fxmlPath);
+               exception.fillInStackTrace();
+                System.out.println(exception);
                 Node content = FXMLLoader.load(getClass().getResource(fxmlPath));
                 tab.setContent(content);
             } catch (IOException ex) {
@@ -102,5 +122,16 @@ public class RootController {
 
         /* Sélectionne l’onglet cible */
         mainTabPane.getSelectionModel().select(tab);
+    }
+
+    @FXML
+    private void onStartChronometer() {
+        Chronometer chronometer = new Chronometer();
+        chronometer.setOnUpdate(() -> {
+            int minutes = chronometer.getValue() / 60;
+            int seconds = chronometer.getValue() % 60;
+            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+        });
+        chronometer.startChronometer(1);
     }
 }

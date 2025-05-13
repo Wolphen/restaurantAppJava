@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="fr.restaurant.controller.TableController"
+      spacing="10">
+
+    <!-- ✅ Padding via balise -->
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <TableView fx:id="tableView" prefHeight="200">
+        <columns>
+            <TableColumn fx:id="idCol" text="Numéro de la table" prefWidth="150"/>
+            <TableColumn fx:id="sizeCol" text="Nombre de place" prefWidth="150"/>
+            <TableColumn fx:id="statusCol" text="Occupé" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10">
+        <TextField fx:id="idField" promptText="Numéro de la table" />
+        <TextField fx:id="sizeField" promptText="Nombre de place" />
+        <Button text="Ajouter une table" onAction="#onAddTable" />
+    </HBox>
+
+    <HBox spacing="10">
+        <Button text="Assigner la table" onAction="#onAssignTable" />
+        <Button text="Libérer la table" onAction="#onFreeTable" />
+    </HBox>
+</VBox>

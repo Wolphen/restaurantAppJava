@@ -15,15 +15,16 @@
             <Label text="Restaurant Manager" styleClass="title"/>
             <Pane HBox.hgrow="ALWAYS"/>
             <!-- Boutons de navigation -->
-            <Button text="Dashboard"  onAction="#openDashboard"/>
-            <Button text="Plats"      onAction="#openDishes"/>
-            <Button text="Commandes"  onAction="#openOrders"/>
-            <Button text="Tables"     onAction="#openTables"/>
-            <Button text="Employés"   onAction="#openEmployees"/>
-            <Button text="Finances"   onAction="#openFinances"/>
+            <Button id="buttonTab" text="Dashboard"  onAction="#openDashboard"/>
+            <Button id="buttonTab" text="Plats"      onAction="#openDishes"/>
+            <Button id="buttonTab" text="Commandes"  onAction="#openOrders"/>
+            <Button id="buttonTab" text="Tables"     onAction="#openTables"/>
+            <Button id="buttonTab" text="Employés"   onAction="#openEmployees"/>
+            <Button id="buttonTab" text="Finances"   onAction="#openFinances"/>
             <Pane minWidth="20"/>
             <!-- Chronomètre global -->
-            <Label fx:id="timerLabel" text="25:00" styleClass="timer"/>
+            <Button text="Démarrer le minuteur" onAction="#onStartChronometer" />
+            <Label fx:id="timerLabel" text="1:00" styleClass="timer"/>
         </ToolBar>
     </top>
 
@@ -61,24 +62,12 @@
                 </Tab>
 
                 <!-- Tables -->
-                <Tab fx:id="tablesTab" text="Tables" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Tables" styleClass="tabTitle"/>
-                            <Label text="Gestion des tables du restaurant."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="tablesTab" text="Tables" closable="false"/>
+
 
                 <!-- Employés -->
-                <Tab fx:id="employeesTab" text="Employés" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Employés" styleClass="tabTitle"/>
-                            <Label text="Fiches et pointage des employés."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="employeesTab"  text="Employés"   closable="false"/>
+
 
                 <!-- Finances -->
                 <Tab fx:id="financesTab" text="Finances" closable="false">
