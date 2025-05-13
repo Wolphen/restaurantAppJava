@@ -1,42 +1,51 @@
 package fr.restaurant.model;
 
 import java.util.List;
-import java.util.StringJoiner;
 
 public class Dish {
 
     private String name;
     private double price;
-    private String category;
+    private String description;        // ← nouveau
+    private String imageUri;           // ← nouveau : lien ou chemin
     private List<String> ingredients;
 
-    public Dish(String name, double price, String category, List<String> ingredients) {
-        this.name = name;
-        this.price = price;
-        this.category = category;
+    public Dish(String name, double price,
+                String description, String imageUri,
+                List<String> ingredients) {
+        this.name        = name;
+        this.price       = price;
+        this.description = description;
+        this.imageUri    = imageUri;
         this.ingredients = ingredients;
     }
 
-    /* getters / setters */
+    /* getters – utilisés par TableView */
+    public String  getName()         { return name; }
+    public double  getPrice()        { return price; }
+    public String  getDescription()  { return description; }
+    public String  getImageUri()     { return imageUri; }
+    public List<String> getIngredients()   { return ingredients; }
+    public String getIngredientsString()   { return String.join(", ", ingredients); }
+    public int getIngredientCount()        { return ingredients.size(); }
 
-    public int getIngredientCount() {        // utilisé pour trier la colonne #
-        return ingredients.size();
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String  getName()        { return name; }
-    public void    setName(String n){ this.name = n; }
-
-    public double  getPrice()                  { return price; }
-    public void    setPrice(double p)          { this.price = p; }
-
-    public String  getCategory()              { return category; }
-    public void    setCategory(String c)      { this.category = c; }
-
-    public List<String> getIngredients()      { return ingredients; }
-    public void        setIngredients(List<String> ing){ this.ingredients = ing; }
-
-    public String getIngredientsString() {
-        return String.join(", ", ingredients);
+    public void setPrice(double price) {
+        this.price = price;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
+    }
+
+    public void setIngredients(List<String> ingredients) {
+        this.ingredients = ingredients;
+    }
 }

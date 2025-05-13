@@ -6,150 +6,192 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SqliteController {
 
-    private final String Uri = "jdbc:sqlite:sample.db";
+    // la base vit ici. si sa bouge, sa suit
+    private static final String URI = "jdbc:sqlite:sample.db";
 
-    public SqliteController() {
-
-    }
-
-
-    // connections bdd sqlite
+    // ------------------------------------------------------------------
+    // boot de la base : on crée tout si ça n’existe pas
+    // ------------------------------------------------------------------
     public void creationTable() {
-        try (
-            Connection connection = DriverManager.getConnection(Uri);
-            Statement statement = connection.createStatement();)
-        {
-            statement.setQueryTimeout(30);
 
-            // table des plats
-            statement.executeUpdate("create table if not exists dish (id integer primary key AUTOINCREMENT, name string not null, price double not null, category string, ingredients string, uri string);");
+        final String sqlDish = """
+            create table if not exists dish (
+                id          integer primary key autoincrement,
+                name        text    not null,
+                price       real    not null,
+                description text,
+                ingredients text,
+                imageUri    text
+            );""";
 
-            // table des salariés
-            statement.executeUpdate("create table if not exists employee (id integer primary key AUTOINCREMENT, name string not null, post string not null, age int not null, hours double);");
+        final String sqlEmployee = """
+            create table if not exists employee (
+                id     integer primary key autoincrement,
+                name   text    not null,
+                post   text    not null,
+                age    integer not null,
+                hours  real
+            );""";
 
-            // table des commandes (status: annulée, en attente, préparée | le numéro de la table et l'id du plat) (kiwi)
-            statement.executeUpdate("create table if not exists orders (id integer primary key AUTOINCREMENT, status string not null, tablee int not null, dish_id int, foreign key(dish_id) references dish(id));");
+        final String sqlOrders = """
+            create table if not exists orders (
+                id      integer primary key autoincrement,
+                status  text    not null,
+                tablee  integer not null,
+                dish_id integer,
+                foreign key(dish_id) references dish(id)
+            );""";
 
-            System.out.println("Les tables ont été crées");
-        }
-        catch(SQLException e)
-        {
-            e.printStackTrace(System.err);
+        try (Connection c = DriverManager.getConnection(URI);
+             Statement  st = c.createStatement()) {
+
+            st.setQueryTimeout(30);           // 30 s, après on rage-quit
+            st.executeUpdate(sqlDish);
+            st.executeUpdate(sqlEmployee);
+            st.executeUpdate(sqlOrders);
+            System.out.println(">> tables prêtes, chef !");
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
     }
 
-    public ObservableList<Dish> fetchDish(){
-        try (
-                Connection connection = DriverManager.getConnection(Uri);
-                Statement statement = connection.createStatement();)
-        {
-            statement.setQueryTimeout(30);
-            ResultSet rs = statement.executeQuery("select * from dish");
-            ObservableList<Dish> data = FXCollections.observableArrayList();
-            while(rs.next())
-            {
-                List<String> ingredients = new ArrayList<>();
-                Dish dish = new Dish(rs.getString("name"), rs.getDouble("price"), "", ingredients);
-                data.add(dish);
+    // ------------------------------------------------------------------
+    // section plats (select / insert / delete)
+    // ------------------------------------------------------------------
+
+    public ObservableList<Dish> fetchDish() {
+
+        String sql = "select * from dish";
+        var list = FXCollections.<Dish>observableArrayList();
+
+        try (Connection c = DriverManager.getConnection(URI);
+             Statement  st = c.createStatement();
+             ResultSet  rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String raw = rs.getString("ingredients");
+                List<String> ing = (raw == null || raw.isBlank())
+                        ? List.of()
+                        : Arrays.stream(raw.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .toList();
+
+                list.add(new Dish(
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getString("description"),
+                        rs.getString("imageUri"),
+                        ing));
             }
-            System.out.println(data);
-            return data;
 
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
-        catch(SQLException e)
-        {
-            e.printStackTrace(System.err);
-            return null;
+        return list;
+    }
+
+    public void addDish(Dish d) {
+
+        String sql = """
+            insert into dish (name, price, description, ingredients, imageUri)
+            values (?,?,?,?,?)""";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, d.getName());
+            ps.setDouble(2, d.getPrice());
+            ps.setString(3, d.getDescription());
+            ps.setString(4, String.join(",", d.getIngredients()));
+            ps.setString(5, d.getImageUri());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
     }
 
-    // enregistrer des infos sur les plats
-    public void addDish(Dish dish) {
-        try (
-                Connection connection = DriverManager.getConnection(Uri);
-                Statement statement = connection.createStatement();)
-        {
-            statement.setQueryTimeout(30);
-            String sqlInsert = "insert into dish (name, price, category, ingredients) VALUES (?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert);
-            preparedStatement.setString(1, dish.getName());
-            preparedStatement.setDouble(2, dish.getPrice());
-            preparedStatement.setString(3, dish.getCategory());
-            preparedStatement.setString(4, dish.getIngredients().toString());
-            preparedStatement.executeUpdate();
-        }
-        catch(SQLException e)
-        {
-            e.printStackTrace(System.err);
+    public void deleteDish(Dish d) {
+
+        String sql = "delete from dish where name = ?";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, d.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
     }
 
+    // ------------------------------------------------------------------
+    // section employés (un copier-coller ? jamais !)
+    // ------------------------------------------------------------------
 
-    public ObservableList<Employee> fetchEmployee(){
-        try (
-                Connection connection = DriverManager.getConnection(Uri);
-                Statement statement = connection.createStatement();)
-        {
-            statement.setQueryTimeout(30);
-            ResultSet rs = statement.executeQuery("select * from employee");
-            ObservableList<Employee> data = FXCollections.observableArrayList();
-            while(rs.next())
-            {
-                List<String> ingredients = new ArrayList<>();
-                Employee employee = new Employee(rs.getInt("age"), rs.getFloat("hours"), rs.getString("post"), rs.getString("name"));
-                data.add(employee);
+    public ObservableList<Employee> fetchEmployee() {
+
+        String sql = "select * from employee";
+        var list = FXCollections.<Employee>observableArrayList();
+
+        try (Connection c = DriverManager.getConnection(URI);
+             Statement  st = c.createStatement();
+             ResultSet  rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                list.add(new Employee(
+                        rs.getInt("age"),
+                        rs.getFloat("hours"),
+                        rs.getString("post"),
+                        rs.getString("name")));
             }
-            System.out.println(data);
-            return data;
 
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
-        catch(SQLException e)
-        {
-            e.printStackTrace(System.err);
-            return null;
+        return list;
+    }
+
+    public void addEmployee(Employee e) {
+
+        String sql = """
+            insert into employee (name, post, age, hours)
+            values (?,?,?,?)""";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, e.getName());
+            ps.setString(2, e.getPost());
+            ps.setInt   (3, e.getAge());
+            ps.setDouble(4, e.getHours());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
     }
 
+    public void deleteEmployee(Employee e) {
 
-    public void addEmployee(Employee employee) {
-        try (
-                Connection connection = DriverManager.getConnection(Uri);
-                Statement statement = connection.createStatement();)
-        {
-            statement.setQueryTimeout(30);
-            String sqlInsert = "insert into employee (name, post, age, hours) VALUES (?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert);
-            preparedStatement.setString(1, employee.getName());
-            preparedStatement.setString(2, employee.getPost());
-            preparedStatement.setInt(3, employee.getAge());
-            preparedStatement.setDouble(3, employee.getHours());
-            preparedStatement.executeUpdate();
-        }
-        catch(SQLException e)
-        {
-            e.printStackTrace(System.err);
+        String sql = "delete from employee where name = ?";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, e.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
         }
     }
-    //
-    public void deleteEmployee(Employee employee) {
-        try (
-                Connection connection = DriverManager.getConnection(Uri);
-                Statement statement = connection.createStatement();)
-        {
-            statement.setQueryTimeout(30);
-            ResultSet rs = statement.executeQuery("delete from employee where name = '" + employee.getName() + "'");
-
-        }
-        catch(SQLException e)
-        {
-            e.printStackTrace(System.err);
-        }
-    }
-
-
 }
