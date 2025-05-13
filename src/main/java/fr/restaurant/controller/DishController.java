@@ -71,7 +71,7 @@ public class DishController {
                     }
                 });
 
-        /* 5. recherche par ingrédient (inchangé) */
+        //  recherche par ingrédient
         searchField.textProperty().addListener((obs, o, n) -> {
             List<String> terms = Arrays.stream(n.toLowerCase().trim().split("\\s+"))
                     .filter(s -> !s.isBlank())

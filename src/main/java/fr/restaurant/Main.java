@@ -16,7 +16,7 @@ public class Main extends Application {
 
         stage.setTitle("Restaurant Manager");
         stage.setScene(scene);
-        stage.setMinWidth(900);   // évite de trop rétrécir
+        stage.setMinWidth(900);
         stage.setMinHeight(600);
         stage.show();
     }
