@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 
+import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

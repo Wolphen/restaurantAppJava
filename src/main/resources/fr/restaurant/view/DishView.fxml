@@ -13,7 +13,7 @@
     <!-- Tableau des plats -->
     <TableView fx:id="dishTable" prefHeight="350">
         <columns>
-            <TableColumn fx:id="nameCol"   text="Nom"          prefWidth="180"/>
+            <TableColumn fx:id="nameCol"   text="Nom"          prefWidth="300"/>
             <TableColumn fx:id="priceCol"  text="Prix €"       prefWidth="70"/>
             <TableColumn fx:id="catCol"    text="Catégorie"    prefWidth="120"/>
             <TableColumn fx:id="ingCol"    text="Ingrédients"  prefWidth="300"/>
