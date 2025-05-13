@@ -1,9 +1,12 @@
 package fr.restaurant;
 
+import fr.restaurant.controller.SqliteController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.sql.*;
 
 public class Main extends Application {
     @Override
@@ -20,5 +23,12 @@ public class Main extends Application {
         stage.setMinHeight(600);
         stage.show();
     }
-    public static void main(String[] args) { launch(args); }
+    public static void main(String[] args) {
+        launch(args);
+
+        // création des tables
+        SqliteController bdd = new SqliteController();
+        bdd.creationTable();
+
+    }
 }
