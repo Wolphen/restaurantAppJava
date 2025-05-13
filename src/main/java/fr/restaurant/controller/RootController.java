@@ -26,7 +26,7 @@ public class RootController {
     @FXML private Tab financesTab;
 
     @FXML private Label timerLabel;
-
+    private Chronometer currentChrono;
     // initialisation
     @FXML
     private void initialize() {
@@ -126,12 +126,32 @@ public class RootController {
 
     @FXML
     private void onStartChronometer() {
-        Chronometer chronometer = new Chronometer();
-        chronometer.setOnUpdate(() -> {
-            int minutes = chronometer.getValue() / 60;
-            int seconds = chronometer.getValue() % 60;
+
+        if (currentChrono != null && currentChrono.isAlive()) {
+            currentChrono.interrupt();          // coupe le thread en douceur
+        }
+
+        // nouveau chrono
+        currentChrono = new Chronometer();
+
+        currentChrono.setOnUpdate(() -> {
+            int total   = currentChrono.getValue();     // secondes restantes
+            int minutes = total / 60;
+            int seconds = total % 60;
+
             timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+
+            // un peu de style selon le temps restant
+            if (total == 0) {
+                timerLabel.getStyleClass().setAll("timer", "finished");
+            } else if (total <= 60) {
+                timerLabel.getStyleClass().setAll("timer", "danger");
+            } else {
+                timerLabel.getStyleClass().setAll("timer", "running");
+            }
         });
-        chronometer.startChronometer(25);
+
+        timerLabel.getStyleClass().setAll("timer", "running");
+        currentChrono.startChronometer(25);            // 25 min par défaut
     }
 }

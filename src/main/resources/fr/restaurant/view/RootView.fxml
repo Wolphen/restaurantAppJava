@@ -24,7 +24,7 @@
             <Pane minWidth="20"/>
             <!-- Chronomètre global -->
             <Label fx:id="timerLabel"
-                   text="1:00"
+                   text="25:00"
                    styleClass="timer"
                    onMouseClicked="#onStartChronometer"
             style="-fx-cursor: hand;"/>
