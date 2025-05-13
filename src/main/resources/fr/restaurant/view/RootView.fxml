@@ -23,7 +23,8 @@
             <Button id="buttonTab" text="Finances"   onAction="#openFinances"/>
             <Pane minWidth="20"/>
             <!-- Chronomètre global -->
-            <Label fx:id="timerLabel" text="25:00" styleClass="timer"/>
+            <Button text="Démarrer le minuteur" onAction="#onStartChronometer" />
+            <Label fx:id="timerLabel" text="1:00" styleClass="timer"/>
         </ToolBar>
     </top>
 
