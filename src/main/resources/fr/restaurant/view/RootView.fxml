@@ -15,12 +15,12 @@
             <Label text="Restaurant Manager" styleClass="title"/>
             <Pane HBox.hgrow="ALWAYS"/>
             <!-- Boutons de navigation -->
-            <Button text="Dashboard"  onAction="#openDashboard"/>
-            <Button text="Plats"      onAction="#openDishes"/>
-            <Button text="Commandes"  onAction="#openOrders"/>
-            <Button text="Tables"     onAction="#openTables"/>
-            <Button text="Employés"   onAction="#openEmployees"/>
-            <Button text="Finances"   onAction="#openFinances"/>
+            <Button id="buttonTab" text="Dashboard"  onAction="#openDashboard"/>
+            <Button id="buttonTab" text="Plats"      onAction="#openDishes"/>
+            <Button id="buttonTab" text="Commandes"  onAction="#openOrders"/>
+            <Button id="buttonTab" text="Tables"     onAction="#openTables"/>
+            <Button id="buttonTab" text="Employés"   onAction="#openEmployees"/>
+            <Button id="buttonTab" text="Finances"   onAction="#openFinances"/>
             <Pane minWidth="20"/>
             <!-- Chronomètre global -->
             <Label fx:id="timerLabel" text="25:00" styleClass="timer"/>
