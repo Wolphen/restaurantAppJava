@@ -132,6 +132,6 @@ public class RootController {
             int seconds = chronometer.getValue() % 60;
             timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
         });
-        chronometer.startChronometer(1);
+        chronometer.startChronometer(25);
     }
 }

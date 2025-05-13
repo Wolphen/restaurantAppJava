@@ -2,8 +2,8 @@ package fr.restaurant.controller;
 
 import fr.restaurant.model.Employee;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
@@ -13,154 +13,156 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
+import java.util.Arrays;
 
 public class EmployeeController {
 
-    public TextField searchField;
-    public TextField nameField;
-    public TextField ageField;
-    public TextField postField;
-    public Button buttonAdd;
+    // champs fxml
+    @FXML private TextField searchField;
+    @FXML private TextField nameField;
+    @FXML private TextField ageField;
+    @FXML private TextField postField;
+    @FXML private Button    buttonAdd;
+
     @FXML private TableView<Employee> employeeTable;
-    @FXML private TableColumn<Employee, String> nameCol;
-    @FXML private TableColumn<Employee, Integer> ageCol;
-    @FXML private TableColumn<Employee, String> postCol;
-    @FXML private TableColumn<Employee, Double> hoursCol;
-    @FXML private TableColumn<Employee, Void> deleteCol;
-    @FXML private TableColumn<Employee, Void> addHourCol;
+    @FXML private TableColumn<Employee,String>  nameCol;
+    @FXML private TableColumn<Employee,Integer> ageCol;
+    @FXML private TableColumn<Employee,String>  postCol;
+    @FXML private TableColumn<Employee,Double>  hoursCol;
+    @FXML private TableColumn<Employee,Void>    deleteCol;
+    @FXML private TableColumn<Employee,Void>    addHourCol;
 
+    // la base
+    private final SqliteController db = new SqliteController();
 
-    SqliteController sqliteController = new SqliteController();
-
-    private final ObservableList<Employee> data = FXCollections.observableArrayList(
-            new Employee(30, 50, "Caissier", "Jean"),
-            new Employee(20, 60, "Cuisinier", "Théo"),
-            new Employee(60, 90, "Serveur", "François")
-    );
+    // on charge les salariés depuis sqlite
+    private final ObservableList<Employee> data =
+            FXCollections.observableArrayList(db.fetchEmployee());
 
     @FXML
     private void initialize() {
-        // Liaison des colonnes
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        ageCol.setCellValueFactory(new PropertyValueFactory<>("age"));
-        postCol.setCellValueFactory(new PropertyValueFactory<>("post"));
+
+        // liaison colonnes -> getters
+        nameCol .setCellValueFactory(new PropertyValueFactory<>("name"));
+        ageCol  .setCellValueFactory(new PropertyValueFactory<>("age"));
+        postCol .setCellValueFactory(new PropertyValueFactory<>("post"));
         hoursCol.setCellValueFactory(new PropertyValueFactory<>("hours"));
 
-        // FilteredList pilotée par le champ searchField
+        // filtre + tri
         FilteredList<Employee> filtered = new FilteredList<>(data, e -> true);
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            String q = newVal.trim().toLowerCase();
-            filtered.setPredicate(e -> q.isEmpty() || e.getName().toLowerCase().contains(q));
-        });
-
-        // SortedList pour activer le tri au clic
-        SortedList<Employee> sorted = new SortedList<>(filtered);
+        SortedList<Employee>   sorted   = new SortedList<>(filtered);
         sorted.comparatorProperty().bind(employeeTable.comparatorProperty());
         employeeTable.setItems(sorted);
 
-        // Mono-colonne : on garde la dernière colonne cliquée
+        // 1 seul critère de tri à la fois
         employeeTable.getSortOrder().addListener(
                 (ListChangeListener<TableColumn<Employee, ?>>) c -> {
                     var order = employeeTable.getSortOrder();
-                    if (order.size() > 1) {
-                        TableColumn<Employee, ?> last = order.get(order.size() - 1);
-                        order.clear();
-                        order.add(last);
-                    }
+                    if (order.size() > 1) order.setAll(order.get(order.size()-1));
                 });
 
-        // Création du CellFactory pour le bouton supprimer
-        deleteCol.setCellFactory(param -> new TableCell<Employee, Void>() {
-            private final Button deleteButton = new Button("Supprimer");
+        // recherche sur le prénom
+        searchField.textProperty().addListener((o, oldVal, newVal) -> {
+            var q = newVal.trim().toLowerCase();
+            filtered.setPredicate(e -> q.isEmpty() ||
+                    e.getName().toLowerCase().contains(q));
+        });
+
+        // bouton supprimer
+        deleteCol.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("supprimer");
+            private final HBox box = new HBox(btn); // conteneur centré
 
             {
-                deleteButton.setOnAction(event -> {
-                    Employee employee = getTableView().getItems().get(getIndex());
-                    data.remove(employee);
+                box.setAlignment(Pos.CENTER);
+                btn.setOnAction(evt -> {
+                    Employee e = getTableView().getItems().get(getIndex());
+                    db.deleteEmployee(e);
+                    data.remove(e);
                 });
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(deleteButton);
-                }
+            protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                setGraphic(empty ? null : box);
             }
         });
 
-        // Création du CellFactory pour le bouton ajouter des heures
-        addHourCol.setCellFactory(param -> new TableCell<Employee, Void>() {
-            private final Button addHourButton = new Button("Ajouter des heures");
+// bouton ajouter des heures
+        addHourCol.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("ajout heures");
+            private final HBox box = new HBox(btn); // conteneur centré
 
             {
-                addHourButton.setOnAction(event -> {
-                    Employee employee = getTableView().getItems().get(getIndex());
-
-                    // Création de la nouvelle fenêtre
-                    Stage stage = new Stage();
-                    stage.setTitle("Ajouter des heures");
-
-                    // Contenu de la fenêtre
-                    VBox vbox = new VBox(10);
-                    vbox.setPadding(new Insets(10));
-                    Label label = new Label("Ajoutez des heures pour : " + employee.getName());
-                    TextField hoursField = new TextField();
-                    hoursField.setPromptText("Entrez le nombre d'heures");
-                    Button saveButton = new Button("Enregistrer");
-
-                    saveButton.setOnAction(e -> {
-                        try {
-                            double hours = Double.parseDouble(hoursField.getText());
-                            employee.setHours((float) (employee.getHours() + hours)); // Mise à jour des heures
-                            getTableView().refresh(); // Rafraîchissement de la table
-                            stage.close(); // Fermeture de la fenêtre
-                        } catch (NumberFormatException ex) {
-                            new Alert(Alert.AlertType.ERROR, "Veuillez entrer un nombre valide.").showAndWait();
-                        }
-                    });
-
-                    vbox.getChildren().addAll(label, hoursField, saveButton);
-
-                    // Configuration de la scène et affichage
-                    Scene scene = new Scene(vbox, 300, 200);
-                    stage.setScene(scene);
-                    stage.show();
-                });
+                box.setAlignment(Pos.CENTER);
+                btn.setOnAction(evt -> openHoursDialog(
+                        getTableView().getItems().get(getIndex())));
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(addHourButton);
-                }
+            protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                setGraphic(empty ? null : box);
             }
         });
     }
 
     @FXML
     private void onAdd() {
-        if (nameField.getText().isBlank() ||
-                ageField.getText().isBlank() ||
-                postField.getText().isBlank()) return;
 
-        try {
-            int age = Integer.parseInt(ageField.getText());
-            Employee employee = new Employee(age, 0, postField.getText(), nameField.getText());
-            data.add(employee);
-            // ajout en bdd
-            sqliteController.addEmployee(employee);
+        if (Arrays.asList(nameField, ageField, postField)
+                .stream().anyMatch(tf -> tf.getText().isBlank())) return;
 
-            nameField.clear();
-            postField.clear();
-            ageField.clear();
-        } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "Âge invalide").showAndWait();
+        int age;
+        try { age = Integer.parseInt(ageField.getText()); }
+        catch (NumberFormatException nope) {
+            showError("âge invalide");
+            return;
         }
+
+        Employee e = new Employee(age, 0, postField.getText(), nameField.getText());
+        db.addEmployee(e);
+        data.add(e);
+
+        nameField.clear(); ageField.clear(); postField.clear();
+    }
+
+    // petite fenêtre pour ajouter des heures
+    private void openHoursDialog(Employee e) {
+
+        var stage = new Stage();
+        stage.setTitle("heures pour " + e.getName());
+
+        var vbox = new VBox(10);
+        vbox.setPadding(new Insets(10));
+
+        var tf   = new TextField();
+        tf.setPromptText("nombre d'heures");
+        var save = new Button("enregistrer");
+
+        save.setOnAction(a -> {
+            try {
+                double h = Double.parseDouble(tf.getText());
+                e.setHours((float) (e.getHours() + h));
+                db.updateEmployeeHours(e);
+                employeeTable.refresh();
+                stage.close();
+            } catch (NumberFormatException nope) {
+                showError("entre un nombre, pas du charabia");
+            }
+        });
+
+        vbox.getChildren().addAll(
+                new Label("Ajouter des heures pour " + e.getName()), tf, save);
+
+        stage.setScene(new Scene(vbox, 250, 120));
+        stage.show();
+    }
+
+    private void showError(String msg) {
+        new Alert(Alert.AlertType.ERROR, msg).showAndWait();
     }
 }

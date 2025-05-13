@@ -2,6 +2,8 @@ package fr.restaurant.controller;
 
 import fr.restaurant.model.Dish;
 import fr.restaurant.model.Employee;
+import fr.restaurant.model.Table;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -47,6 +49,13 @@ public class SqliteController {
                 foreign key(dish_id) references dish(id)
             );""";
 
+        final String sqlRestTable = """
+    create table if not exists rest_table (
+        id       integer primary key,
+        size     integer not null,
+        occupied boolean not null
+    );""";
+
         try (Connection c = DriverManager.getConnection(URI);
              Statement  st = c.createStatement()) {
 
@@ -54,7 +63,9 @@ public class SqliteController {
             st.executeUpdate(sqlDish);
             st.executeUpdate(sqlEmployee);
             st.executeUpdate(sqlOrders);
-            System.out.println(">> tables prêtes, chef !");
+            st.executeUpdate(sqlRestTable);
+
+            System.out.println("tables prêtes, chef !");
 
         } catch (SQLException boom) {
             boom.printStackTrace(System.err);
@@ -188,6 +199,80 @@ public class SqliteController {
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, e.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
+        }
+    }
+
+    public void updateEmployeeHours(Employee e) {
+
+        String sql = "update employee set hours = ? where name = ?";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setDouble(1, e.getHours());
+            ps.setString(2,  e.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
+        }
+    }
+// ------------------------------------------------------------------
+// 4) CRUD rest_table  (id, size, occupied)
+// ------------------------------------------------------------------
+
+    public ObservableList<Table> fetchTables() {
+
+        String sql = "select * from rest_table";
+        var list = FXCollections.<Table>observableArrayList();
+
+        try (Connection c = DriverManager.getConnection(URI);
+             Statement  st = c.createStatement();
+             ResultSet  rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                list.add(new Table(
+                        rs.getInt("id"),
+                        rs.getInt("size"),
+                        rs.getBoolean("occupied")));
+            }
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
+        }
+        return list;
+    }
+
+    public void addTable(Table t) {
+
+        String sql = "insert into rest_table (id, size, occupied) values (?,?,?)";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt   (1, t.getId());
+            ps.setInt   (2, t.getSize());
+            ps.setBoolean(3, t.isOccupied());
+            ps.executeUpdate();
+
+        } catch (SQLException boom) {
+            boom.printStackTrace(System.err);
+        }
+    }
+
+    public void updateTableStatus(int id, boolean occupied) {
+
+        String sql = "update rest_table set occupied = ? where id = ?";
+
+        try (Connection c = DriverManager.getConnection(URI);
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setBoolean(1, occupied);
+            ps.setInt    (2, id);
             ps.executeUpdate();
 
         } catch (SQLException boom) {

@@ -9,11 +9,11 @@
 
     <TableView fx:id="employeeTable" prefHeight="330">
         <columns>
-            <TableColumn fx:id="nameCol" prefWidth="140" text="Nom" />
-            <TableColumn fx:id="ageCol" prefWidth="60" text="Âge" />
-            <TableColumn fx:id="postCol" prefWidth="120" text="Poste" />
-            <TableColumn fx:id="hoursCol" prefWidth="80" text="Heures" />
-            <TableColumn fx:id="deleteCol" prefWidth="100" text="Supprimer">
+            <TableColumn fx:id="nameCol" prefWidth="140" style="-fx-alignment: CENTER;" text="Nom" />
+            <TableColumn fx:id="ageCol" prefWidth="60" style="-fx-alignment: CENTER;" text="Âge" />
+            <TableColumn fx:id="postCol" prefWidth="120" style="-fx-alignment: CENTER;" text="Poste" />
+            <TableColumn fx:id="hoursCol" prefWidth="80" style="-fx-alignment: CENTER;" text="Heures" />
+            <TableColumn fx:id="deleteCol" prefWidth="100" style="-fx-alignment: CENTER;" text="Supprimer">
             </TableColumn>
             <TableColumn fx:id="addHourCol" prefWidth="140" text="Ajoutez des heures">
             </TableColumn>
