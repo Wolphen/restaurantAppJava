@@ -17,13 +17,13 @@ public class SqliteController {
             statement.setQueryTimeout(30);
 
             // table des plats
-            statement.executeUpdate("create table if not exists dish (name string not null, price double not null, category string, ingredients string);");
+            statement.executeUpdate("create table if not exists dish (id integer primary key AUTOINCREMENT, name string not null, price double not null, category string, ingredients string);");
 
             // table des salariés
-            statement.executeUpdate("create table if not exists employee (name string not null, post string not null, double hours);");
+            statement.executeUpdate("create table if not exists employee (id integer primary key AUTOINCREMENT, name string not null, post string not null, double hours);");
 
             // table des commandes (status: annulée, en attente, préparée | le numéro de la table et l'id du plat) (kiwi)
-            statement.executeUpdate("create table if not exists orders (status string not null, tablee int not null, dish_id int, foreign key(dish_id) references dish(id));");
+            statement.executeUpdate("create table if not exists orders (id integer primary key AUTOINCREMENT, status string not null, tablee int not null, dish_id int, foreign key(dish_id) references dish(id));");
 
 //            statement.executeUpdate("insert into dish values('KiwiCrème', 12.0, 'dessert', 'kiwi, crème')");
 //            statement.executeUpdate("insert into dish values('KiwiFraise', 23.9, 'plat', 'kiwi, fraise')");
@@ -32,13 +32,13 @@ public class SqliteController {
 //            statement.executeUpdate("insert into orders values('cancel', 'table2', 2)");
 
             System.out.println("Table created");
-//            ResultSet rs = statement.executeQuery("select * from orders as ord join dish as dish on ord.dish_id = dish.id ");
-//            while(rs.next())
-//            {
-//                // read the result set
-//                System.out.println("rowid = " + rs.getInt("rowid"));
-//                System.out.println("id = " + rs.getInt("id"));
-//            }
+//            ResultSet rs = statement.executeQuery("select * from orders as ord join dish as dish on ord.dish_id = dish.rowid ");
+            ResultSet rs = statement.executeQuery("select * from orders");
+            System.out.println(rs);
+            while(rs.next())
+            {
+                System.out.println("rowid = " + rs.getInt("id"));
+            }
         }
         catch(SQLException e)
         {
