@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.restaurant.controller.EmployeeController">
+
+    <Label styleClass="tabTitle" text="Gestion des employés" />
+
+    <!-- Tableau des plats -->
+    <TableView fx:id="employeeTable" prefHeight="350">
+        <columns>
+            <TableColumn fx:id="nameCol" prefWidth="100" text="Nom" />
+            <TableColumn fx:id="priceCol" prefWidth="100" text="Prix €" />
+            <TableColumn fx:id="catCol" prefWidth="100" text="Catégorie" />
+            <TableColumn fx:id="ingCol" prefWidth="100" text="Ingrédients" />
+        </columns>
+    </TableView>
+
+
+    <!-- Ligne d’ajout + recherche -->
+<!--    <HBox spacing="8">-->
+<!--        <TextField fx:id="nameField" promptText="Nom" />-->
+<!--        <TextField fx:id="priceField" promptText="Prix" />-->
+<!--        <TextField fx:id="ingField" promptText="Ingrédients (virgules)" />-->
+<!--        <Pane HBox.hgrow="ALWAYS" />-->
+<!--        <TextField fx:id="searchField" promptText="Recherche ingrédient…" />-->
+<!--    </HBox>-->
+</VBox>
