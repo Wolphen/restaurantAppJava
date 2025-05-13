@@ -1,12 +1,24 @@
 package fr.restaurant.controller;
 
 import fr.restaurant.model.Dish;
+import fr.restaurant.model.Employee;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SqliteController {
 
     private final String Uri = "jdbc:sqlite:sample.db";
+
+
+
+    public SqliteController() {
+
+    }
+
 
     // connections bdd sqlite
     public void creationTable() {
@@ -17,25 +29,44 @@ public class SqliteController {
             statement.setQueryTimeout(30);
 
             // table des plats
-            statement.executeUpdate("create table if not exists dish (id integer primary key AUTOINCREMENT, name string not null, price double not null, category string, ingredients string);");
+            statement.executeUpdate("create table if not exists dish (id integer primary key AUTOINCREMENT, name string not null, price double not null, category string, ingredients string, uri string);");
 
             // table des salariés
-            statement.executeUpdate("create table if not exists employee (id integer primary key AUTOINCREMENT, name string not null, post string not null, double hours);");
+            statement.executeUpdate("create table if not exists employee (id integer primary key AUTOINCREMENT, name string not null, post string not null, hours double);");
 
             // table des commandes (status: annulée, en attente, préparée | le numéro de la table et l'id du plat) (kiwi)
             statement.executeUpdate("create table if not exists orders (id integer primary key AUTOINCREMENT, status string not null, tablee int not null, dish_id int, foreign key(dish_id) references dish(id));");
-
-//            statement.executeUpdate("insert into dish values('KiwiCrème', 12.0, 'dessert', 'kiwi, crème')");
-//            statement.executeUpdate("insert into dish values('KiwiFraise', 23.9, 'plat', 'kiwi, fraise')");
-//
-//            statement.executeUpdate("insert into orders values('attente', 'table1', 1)");
-//            statement.executeUpdate("insert into orders values('cancel', 'table2', 2)");
 
             System.out.println("Les tables ont été crées");
         }
         catch(SQLException e)
         {
             e.printStackTrace(System.err);
+        }
+    }
+
+    public ObservableList<Dish> fetchDish(){
+        try (
+                Connection connection = DriverManager.getConnection(Uri);
+                Statement statement = connection.createStatement();)
+        {
+            statement.setQueryTimeout(30);
+            ResultSet rs = statement.executeQuery("select * from dish");
+            ObservableList<Dish> data = FXCollections.observableArrayList();
+            while(rs.next())
+            {
+                List<String> ingredients = new ArrayList<>();
+                Dish dish = new Dish(rs.getString("name"), rs.getDouble("price"), "", ingredients);
+                data.add(dish);
+            }
+            System.out.println(data);
+            return data;
+
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace(System.err);
+            return null;
         }
     }
 
@@ -51,7 +82,7 @@ public class SqliteController {
             preparedStatement.setString(1, dish.getName());
             preparedStatement.setDouble(2, dish.getPrice());
             preparedStatement.setString(3, dish.getCategory());
-//            preparedStatement.setL(4, dish.getIngredients());
+            preparedStatement.setString(4, dish.getIngredients().toString());
             preparedStatement.executeUpdate();
         }
         catch(SQLException e)
@@ -59,5 +90,26 @@ public class SqliteController {
             e.printStackTrace(System.err);
         }
     }
+
+
+    public void addEmployee(Employee employee) {
+        try (
+                Connection connection = DriverManager.getConnection(Uri);
+                Statement statement = connection.createStatement();)
+        {
+            statement.setQueryTimeout(30);
+            String sqlInsert = "insert into employee (name, post, hours) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert);
+            preparedStatement.setString(1, employee.getName());
+            preparedStatement.setString(2, employee.getPost());
+            preparedStatement.setInt(3, employee.getAge());
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace(System.err);
+        }
+    }
+
 
 }

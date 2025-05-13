@@ -1,7 +1,6 @@
 package fr.restaurant.controller;
 
 import fr.restaurant.model.Dish;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -10,7 +9,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 
-import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,14 +32,8 @@ public class DishController {
     // donnée de test
     SqliteController sqliteController = new SqliteController();
 
-    private final ObservableList<Dish> data = FXCollections.observableArrayList(
-            new Dish("Pizza Margherita", 12.5, "Italien",
-                    List.of("tomate", "mozzarella", "basilic")),
-            new Dish("Burger Maison", 9.9, "Américain",
-                    List.of("bœuf", "salade", "tomate", "cheddar")),
-            new Dish("Curry Veggie", 11.0, "Indien",
-                    List.of("pois chiches", "curry", "lait de coco"))
-    );
+
+    private final ObservableList<Dish> data = sqliteController.fetchDish();
 
     /* ---------- initialisation ---------- */
     @FXML
@@ -54,6 +46,8 @@ public class DishController {
         ingCol.setCellValueFactory(new PropertyValueFactory<>("ingredientsString"));
         countCol.setCellValueFactory(new PropertyValueFactory<>("ingredientCount"));
 
+        System.out.println("Je suis la data");
+        System.out.println(data);
         // FilteredList pour la recherche
         FilteredList<Dish> filtered = new FilteredList<>(data, d -> true);
 
