@@ -1,56 +1,103 @@
 package fr.restaurant.Utils;
 
+import fr.restaurant.controller.OrderController;
 import javafx.application.Platform;
 
+/**
+ * Un petit chrono façon pomodoro : démarre, s’arrête, relance
+ * et déclenche OrderController.can/can’tOrder selon la minute.
+ */
 public class Chronometer extends Thread {
+
+    // temps restant en secondes
     private int value;
-    private int defaultMinutes = 25; // Temps par défaut en minutes
-    private boolean running;
+
+    // la durée « officielle » (25 min par défaut)
+    private int defaultMinutes = 25;
+
+    // true → décrémente, false → pause/stop
+    private volatile boolean running = false;
+
+    // flag pour sortir proprement de run()
+    private volatile boolean keepAlive = true;
+
+    // callback UI (appelé toutes les secondes via Platform.runLater)
     private Runnable onUpdate;
 
-    public void setOnUpdate(Runnable onUpdate) {
-        this.onUpdate = onUpdate;
-    }
+    // pour ne déclencher l’alerte 15 min qu’une fois
+    private int warned = 0;
 
+    /*---------------------------------------------------*/
+    /* setters                                           */
+    /*---------------------------------------------------*/
+    public void setOnUpdate(Runnable r) { this.onUpdate = r; }
+
+    /*---------------------------------------------------*/
+    /* Boucle du thread                                  */
+    /*---------------------------------------------------*/
     @Override
     public void run() {
-        while (true) {
+        while (keepAlive) {
             try {
-                Thread.sleep(1000); // Attendre 1 seconde
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                break;
+                Thread.sleep(1_000);               // chaque seconde
+            } catch (InterruptedException stop) {
+                break;                              // on nous a réveillés : fin
             }
-            synchronized (this) {
-                if (running) {
-                    value--;
-                    if (onUpdate != null) {
-                        Platform.runLater(onUpdate);
-                    }
-                    if (value <= 0) {
-                        System.out.println("Chronomètre terminé !");
-                        running = false;
-                        value = defaultMinutes * 60; // Réinitialiser le temps
-                        if (onUpdate != null) {
-                            Platform.runLater(onUpdate); // Mettre à jour l'interface
-                        }
-                        break;
-                    }
-                }
+
+            if (!running) continue;                 // en pause ⇒ on boucle
+
+            value--;
+
+            // mise à jour UI
+            if (onUpdate != null) Platform.runLater(onUpdate);
+
+            // alerte 15 mn restantes
+            if (value <= 15 * 60 && warned == 0) {
+                warned = 1;
+                OrderController.cantOrder();
+            }
+
+            // fin de chrono
+            if (value <= 0) {
+                running = false;
+                warned  = 0;
+                OrderController.canOrder();        // on ré-autorise les commandes
+                value   = defaultMinutes * 60;     // prêt pour un nouveau round
+                if (onUpdate != null) Platform.runLater(onUpdate);
             }
         }
     }
 
+    /*---------------------------------------------------*/
+    /* API publique                                      */
+    /*---------------------------------------------------*/
     public synchronized void startChronometer(int minutes) {
-        this.defaultMinutes = minutes; // Définir la valeur par défaut
-        this.value = minutes * 60; // Convertir les minutes en secondes
-        this.running = true;
-        if (!this.isAlive()) {
-            this.start(); // Démarrer le thread si ce n'est pas déjà fait
-        }
+        defaultMinutes = minutes;
+        value          = minutes * 60;
+        running        = true;
+        warned         = 0;
+        OrderController.canOrder();
+
+        // si le thread n’est pas encore lancé, on le lance
+        if (!isAlive()) start();
     }
 
-    public synchronized int getValue() {
-        return value;
+    /** met le chrono en pause et remet le compteur à 0 */
+    public synchronized void stopChronometer() {
+        running = false;
+        value   = 0;
+        warned  = 0;
+        OrderController.canOrder();
+        if (onUpdate != null) Platform.runLater(onUpdate);
     }
+
+    /** tue complètement le thread (irréversible) */
+    public void kill() {
+        keepAlive = false;
+        interrupt();      // sort du sleep
+    }
+
+    public synchronized int getValue() { return value; }
+
+    public synchronized boolean isRunning() { return running; }
 }

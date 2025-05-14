@@ -61,6 +61,14 @@ public class RootController {
     @FXML
     private void openOrders() {
         System.out.println(" Ouverture onglet Order");
+        var url = getClass().getResource("/fr/restaurant/view/OrderView.fxml");
+        System.out.println("URL DishView = " + url);
+
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
 
         selectAndLoad(ordersTab, "/fr/restaurant/view/OrderView.fxml");
     }
@@ -68,7 +76,7 @@ public class RootController {
     @FXML
     private void openTables() {
         System.out.println(" Ouverture onglet Tables");
-        var url = getClass().getResource("/fr/restaurant/view/DishView.fxml");
+        var url = getClass().getResource("/fr/restaurant/view/TableView.fxml");
         System.out.println("URL DishView = " + url);
 
 
@@ -128,10 +136,19 @@ public class RootController {
     private void onStartChronometer() {
         Chronometer chronometer = new Chronometer();
         chronometer.setOnUpdate(() -> {
-            int minutes = chronometer.getValue() / 60;
-            int seconds = chronometer.getValue() % 60;
+            int totalSeconds = chronometer.getValue();
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
             timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+
+            // Détection si moins de 15 minutes restantes
+            if (totalSeconds <= 15 * 60) {
+                timerLabel.setStyle("-fx-text-fill: red;");
+            } else {
+                timerLabel.setStyle("-fx-text-fill: black;");
+            }
+
         });
-        chronometer.startChronometer(25);
+        chronometer.startChronometer(15);
     }
 }

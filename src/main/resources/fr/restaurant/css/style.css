@@ -27,6 +27,13 @@
     -fx-text-fill: white;
     -fx-font-size: 14px;
 }
+<!-- Griser le bouton -->
+#buttonDeactivated {
+    -fx-background-radius: 8;
+    -fx-background-color: #ffffff22;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
 
 .button:hover {
     -fx-background-color: #ffffff55;

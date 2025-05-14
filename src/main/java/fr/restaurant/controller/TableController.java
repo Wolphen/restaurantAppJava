@@ -1,11 +1,16 @@
+// java
 package fr.restaurant.controller;
 
 import fr.restaurant.model.Table;
+import fr.restaurant.model.Order;
 import fr.restaurant.service.TableService;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class TableController {
@@ -25,18 +30,32 @@ public class TableController {
     private TextField sizeField;
 
     private final TableService service = new TableService();
-    private final ObservableList<Table> data = service.getTables();
 
     @FXML
     private void initialize() {
-
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         sizeCol.setCellValueFactory(new PropertyValueFactory<>("size"));
-        statusCol.setCellValueFactory(
-                cell -> new javafx.beans.property.SimpleBooleanProperty(
-                        cell.getValue().isOccupied()).asObject());
+        statusCol.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleBooleanProperty(cell.getValue().isOccupied()).asObject());
 
-        tableView.setItems(data);
+        tableView.setItems(service.getTables());
+
+        // Ajout d'un écouteur sur double-clic pour afficher les commandes associées
+        tableView.setRowFactory(tv -> {
+            TableRow<Table> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Table clickedTable = row.getItem();
+                    ObservableList<Order> orders = service.getOrdersForTable(clickedTable.getId());
+                    StringBuilder info = new StringBuilder("Commandes pour la table " + clickedTable.getId() + " :\n");
+                    for (Order order : orders) {
+                        info.append(order.toString()).append("\n");
+                    }
+                    new Alert(Alert.AlertType.INFORMATION, info.toString()).showAndWait();
+                }
+            });
+            return row;
+        });
     }
 
     @FXML
@@ -44,30 +63,31 @@ public class TableController {
         try {
             int id = Integer.parseInt(idField.getText());
             int size = Integer.parseInt(sizeField.getText());
-
-            if (data.stream().anyMatch(t -> t.getId() == id)) {
-                new Alert(Alert.AlertType.ERROR,
-                        "id déjà pris, change de numéro").showAndWait();
+            if (tableView.getItems().stream().anyMatch(t -> t.getId() == id)) {
+                new Alert(Alert.AlertType.ERROR, "id déjà pris, change de numéro").showAndWait();
                 return;
             }
             service.addTable(new Table(id, size, false));
-
             idField.clear();
             sizeField.clear();
-        } catch (NumberFormatException nope) {
+        } catch (NumberFormatException e) {
             new Alert(Alert.AlertType.ERROR, "chiffres uniquement").showAndWait();
         }
     }
 
     @FXML
     private void onAssignTable() {
-        var t = tableView.getSelectionModel().getSelectedItem();
-        if (t != null && service.assignTable(t.getId())) tableView.refresh();
+        Table t = tableView.getSelectionModel().getSelectedItem();
+        if (t != null && service.assignTable(t.getId())) {
+            tableView.refresh();
+        }
     }
 
     @FXML
     private void onFreeTable() {
-        var t = tableView.getSelectionModel().getSelectedItem();
-        if (t != null && service.freeTable(t.getId())) tableView.refresh();
+        Table t = tableView.getSelectionModel().getSelectedItem();
+        if (t != null && service.freeTable(t.getId())) {
+            tableView.refresh();
+        }
     }
 }
