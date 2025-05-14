@@ -73,15 +73,7 @@
 
 
                 <!-- Finances -->
-                <Tab fx:id="financesTab" text="Finances" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Finances" styleClass="tabTitle"/>
-                            <Label text="Recettes, dépenses, export PDF."/>
-                        </VBox>
-                    </content>
-                </Tab>
-
+                <Tab fx:id="financesTab" text="Finances" closable="false" />
             </tabs>
         </TabPane>
     </center>

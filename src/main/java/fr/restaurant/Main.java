@@ -29,7 +29,5 @@ public class Main extends Application {
         bdd.creationTable();
 
         launch(args);
-
-
     }
 }
