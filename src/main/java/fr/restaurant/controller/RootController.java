@@ -31,6 +31,7 @@ public class RootController {
     @FXML
     private void initialize() {
         mainTabPane.setTabMaxHeight(0);
+        openDashboard();
     }
 
 
@@ -38,7 +39,14 @@ public class RootController {
     @FXML
     private void openDashboard() {
         System.out.println(" Ouverture onglet Dashboard");
+        var url = getClass().getResource("/fr/restaurant/view/EmployeeView.fxml");
+        System.out.println("URL Employee = " + url);
 
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
         selectAndLoad(dashboardTab, "/fr/restaurant/view/DashboardView.fxml");
     }
 

@@ -290,8 +290,8 @@ public class SqliteController {
                         }
                     }
                 }
-                // Utilisation de "tablee" tel que défini dans le schéma
                 list.add(new Order(
+                        rsOrders.getInt("id"),
                         rsOrders.getInt("tablee"),
                         rsOrders.getInt("globalPrice"),
                         rsOrders.getString("status"),

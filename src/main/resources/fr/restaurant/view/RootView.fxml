@@ -41,14 +41,8 @@
             <tabs>
 
                 <!-- Dashboard -->
-                <Tab fx:id="dashboardTab" text="Dashboard" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Dashboard" styleClass="tabTitle"/>
-                            <Label text="Vue synthèse : stats et files d’attente."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="dashboardTab" text="Dashboard" closable="false"/>
+
 
                 <!-- Plats -->
                 <Tab fx:id="dishesTab" text="Plats" closable="false"/>

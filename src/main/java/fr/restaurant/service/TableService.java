@@ -12,11 +12,25 @@ import java.util.stream.Collectors;
 
 public class TableService {
 
-    private final SqliteController db = new SqliteController();
 
-    // Liste observable des tables (mise à jour automatiquement dans les vues)
+    private static final TableService INSTANCE = new TableService();
+    public static TableService getInstance() { return INSTANCE; }
+
+    private final SqliteController db = new SqliteController();
     private final ObservableList<Table> tables =
             FXCollections.observableArrayList(db.fetchTables());
+
+    // … addTable / assign / free inchangés …
+
+    /** renvoie toujours les commandes à jour pour la table demandée */
+    public ObservableList<Order> getOrdersForTable(int tableId) {
+        return FXCollections.observableArrayList(
+                db.fetchOrder().stream()
+                        .filter(o -> o.getTable() == tableId)
+                        .toList());
+    }
+
+
 
     // Exemple de liste observable regroupant toutes les commandes courantes
     private final ObservableList<Order> allOrders =
@@ -31,15 +45,6 @@ public class TableService {
         tables.add(t);
     }
 
-    // Méthode ajoutée pour récupérer les commandes associées à une table donnée
-    // java
-    public ObservableList<Order> getOrdersForTable(int tableId) {
-        return FXCollections.observableArrayList(
-                allOrders.stream()
-                        .filter(order -> order.getTable() == tableId)
-                        .collect(Collectors.toList())
-        );
-    }
 
     public List<Table> listAvailableTables() {
         return tables.stream()
