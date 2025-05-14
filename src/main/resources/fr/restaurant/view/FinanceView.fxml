@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="fr.restaurant.controller.FinanceController">
+
+    <Label styleClass="tabTitle" text="Gestion des finances" />
+    <HBox spacing="8">
+<!--        <Label text="Recherche prénom :" />-->
+        <Button fx:id="buttonAdd" onAction="#exportPDF" text="Export PDF" />
+    </HBox>
+</VBox>

@@ -1,5 +1,8 @@
 package fr.restaurant.controller;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfDocument;
+import com.itextpdf.text.pdf.PdfWriter;
 import fr.restaurant.model.Employee;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -15,6 +18,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class EmployeeController {
@@ -112,7 +119,6 @@ public class EmployeeController {
 
     @FXML
     private void onAdd() {
-
         if (Arrays.asList(nameField, ageField, postField)
                 .stream().anyMatch(tf -> tf.getText().isBlank())) return;
 
