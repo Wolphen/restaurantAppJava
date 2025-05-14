@@ -24,7 +24,7 @@
             <Pane minWidth="20"/>
             <!-- Chronomètre global -->
             <Label fx:id="timerLabel"
-                   text="1:00"
+                   text="25:00"
                    styleClass="timer"
                    onMouseClicked="#onStartChronometer"
             style="-fx-cursor: hand;"/>
@@ -55,14 +55,8 @@
 
 
                 <!-- Commandes -->
-                <Tab fx:id="ordersTab" text="Commandes" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Commandes" styleClass="tabTitle"/>
-                            <Label text="Suivi et préparation des commandes."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="ordersTab" text="Commandes" closable="false"/>
+
 
                 <!-- Tables -->
                 <Tab fx:id="tablesTab" text="Tables" closable="false"/>

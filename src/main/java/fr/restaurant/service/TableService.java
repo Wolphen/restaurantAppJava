@@ -1,65 +1,75 @@
+// java
 package fr.restaurant.service;
 
 import fr.restaurant.controller.SqliteController;
 import fr.restaurant.model.Table;
+import fr.restaurant.model.Order;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * le boss des tables : stocke une liste observable et parle à sqlite.
- */
 public class TableService {
 
     private final SqliteController db = new SqliteController();
 
-    // liste qui se met à jour toute seule dans les vues
+    // Liste observable des tables (mise à jour automatiquement dans les vues)
     private final ObservableList<Table> tables =
             FXCollections.observableArrayList(db.fetchTables());
 
-    /* accès lecture – les contrôleurs l’utilisent directement */
-    public ObservableList<Table> getTables() { return tables; }
+    // Exemple de liste observable regroupant toutes les commandes courantes
+    private final ObservableList<Order> allOrders =
+            FXCollections.observableArrayList(db.fetchOrder());
 
-    // ajoute une table (et la persiste)
+    public ObservableList<Table> getTables() {
+        return tables;
+    }
+
     public void addTable(Table t) {
         db.addTable(t);
         tables.add(t);
     }
 
-    // renvoie uniquement les tables libres
+    // Méthode ajoutée pour récupérer les commandes associées à une table donnée
+    // java
+    public ObservableList<Order> getOrdersForTable(int tableId) {
+        return FXCollections.observableArrayList(
+                allOrders.stream()
+                        .filter(order -> order.getTable() == tableId)
+                        .collect(Collectors.toList())
+        );
+    }
+
     public List<Table> listAvailableTables() {
         return tables.stream()
                 .filter(t -> !t.isOccupied())
                 .collect(Collectors.toList());
     }
 
-    // tente d’occuper une table – true si succès
     public boolean assignTable(int id) {
         return changeStatus(id, true);
     }
 
-    // libère une table – true si succès
     public boolean freeTable(int id) {
         return changeStatus(id, false);
     }
 
-    // juste un raccourci pour avoir une copie
     public List<Table> listAllTables() {
         return List.copyOf(tables);
     }
 
-    // implémentation commune
-    private boolean changeStatus(int id, boolean occ) {
+    private boolean changeStatus(int id, boolean occupied) {
         for (Table t : tables) {
             if (t.getId() == id) {
-                if (t.isOccupied() == occ) return false;   // déjà dans le bon état
-                t.setOccupied(occ);
-                db.updateTableStatus(id, occ);
+                if (t.isOccupied() == occupied) {
+                    return false;
+                }
+                t.setOccupied(occupied);
+                db.updateTableStatus(id, occupied);
                 return true;
             }
         }
-        return false; // id inconnu
+        return false;
     }
 }
