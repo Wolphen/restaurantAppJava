@@ -119,34 +119,21 @@ public class EmployeeController {
 
     @FXML
     private void onAdd() {
-        Document pdf = new Document();
-        try {
-        PdfWriter.getInstance(pdf, new FileOutputStream("finances.pdf"));
-            pdf.open();
-            pdf.add(new Paragraph("Finances"));
-            pdf.close();
-            System.out.println("pdf created");
-        } catch (FileNotFoundException | DocumentException e){
-            e.printStackTrace();
+        if (Arrays.asList(nameField, ageField, postField)
+                .stream().anyMatch(tf -> tf.getText().isBlank())) return;
+
+        int age;
+        try { age = Integer.parseInt(ageField.getText()); }
+        catch (NumberFormatException nope) {
+            showError("âge invalide");
+            return;
         }
 
+        Employee e = new Employee(age, 0, postField.getText(), nameField.getText());
+        db.addEmployee(e);
+        data.add(e);
 
-
-//        if (Arrays.asList(nameField, ageField, postField)
-//                .stream().anyMatch(tf -> tf.getText().isBlank())) return;
-//
-//        int age;
-//        try { age = Integer.parseInt(ageField.getText()); }
-//        catch (NumberFormatException nope) {
-//            showError("âge invalide");
-//            return;
-//        }
-//
-//        Employee e = new Employee(age, 0, postField.getText(), nameField.getText());
-//        db.addEmployee(e);
-//        data.add(e);
-//
-//        nameField.clear(); ageField.clear(); postField.clear();
+        nameField.clear(); ageField.clear(); postField.clear();
     }
 
     // petite fenêtre pour ajouter des heures
