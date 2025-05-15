@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx/21"
+          xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="fr.restaurant.controller.DashboardController"
+          hgap="20" vgap="20">
+
+    <!-- padding à 20 px tout autour pour le swag -->
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- 1ère cellule : 5 dernières commandes des tables occupées -->
+    <VBox GridPane.rowIndex="0" GridPane.columnIndex="0" spacing="10">
+        <Label text="5 dernières commandes (tables en service)" styleClass="tabTitle"/>
+        <ListView fx:id="lastOrdersList" prefHeight="150"/>
+    </VBox>
+
+    <!-- 2ème cellule : commandes en attente -->
+    <VBox GridPane.rowIndex="0" GridPane.columnIndex="1" spacing="10">
+        <Label text="Commandes en attente" styleClass="tabTitle"/>
+        <ListView fx:id="pendingOrdersList" prefHeight="150"/>
+    </VBox>
+
+    <!-- 3ème cellule : statuts plats & employés -->
+    <VBox GridPane.rowIndex="1" GridPane.columnIndex="0" spacing="8">
+        <Label text="Stats menu et employés" styleClass="tabTitle"/>
+        <Label fx:id="maxDishLabel"    text="Plat le + cher : "/>
+        <Label fx:id="minDishLabel"    text="Plat le – cher : "/>
+        <Label fx:id="empUnder30Label" text="Employés - 30 ans : "/>
+        <Label fx:id="emp30to45Label"  text="Employés 30–45 ans : "/>
+        <Label fx:id="empOver45Label"  text="Employés + 45 ans : "/>
+        <Label fx:id="totalMenuLabel"  text="Valeur totale de la carte : "/>
+    </VBox>
+
+    <!-- 4ème cellule : montants factures -->
+    <VBox GridPane.rowIndex="1" GridPane.columnIndex="1" spacing="10">
+        <Label text="Montants factures" styleClass="tabTitle"/>
+        <Label fx:id="presentBillsLabel" text="Tables en service : "/>
+        <Label fx:id="leftBillsLabel"    text="Tables libérées    : "/>
+    </VBox>
+
+</GridPane>

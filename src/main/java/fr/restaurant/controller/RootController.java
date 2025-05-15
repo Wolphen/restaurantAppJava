@@ -26,11 +26,12 @@ public class RootController {
     @FXML private Tab financesTab;
 
     @FXML private Label timerLabel;
-
+    private Chronometer currentChrono;
     // initialisation
     @FXML
     private void initialize() {
         mainTabPane.setTabMaxHeight(0);
+        openDashboard();
     }
 
 
@@ -38,7 +39,15 @@ public class RootController {
     @FXML
     private void openDashboard() {
         System.out.println(" Ouverture onglet Dashboard");
+        var url = getClass().getResource("/fr/restaurant/view/EmployeeView.fxml");
+        System.out.println("URL Employee = " + url);
+        dashboardTab.setContent(null);
 
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
         selectAndLoad(dashboardTab, "/fr/restaurant/view/DashboardView.fxml");
     }
 
@@ -84,6 +93,7 @@ public class RootController {
             System.err.println(">> FXML introuvable : vérifie l’emplacement !");
             return;
         }
+        tablesTab.setContent(null);
 
         selectAndLoad(tablesTab, "/fr/restaurant/view/TableView.fxml");
     }
@@ -134,6 +144,7 @@ public class RootController {
 
     @FXML
     private void onStartChronometer() {
+
         Chronometer chronometer = new Chronometer();
         chronometer.setOnUpdate(() -> {
             int totalSeconds = chronometer.getValue();
@@ -149,6 +160,5 @@ public class RootController {
             }
 
         });
-        chronometer.startChronometer(15);
-    }
+        chronometer.startChronometer(15);}
 }

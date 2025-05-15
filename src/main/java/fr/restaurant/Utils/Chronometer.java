@@ -4,7 +4,7 @@ import fr.restaurant.controller.OrderController;
 import javafx.application.Platform;
 
 /**
- * Un petit chrono façon pomodoro : démarre, s’arrête, relance
+ * Un petit chrono  : démarre, s’arrête, relance
  * et déclenche OrderController.can/can’tOrder selon la minute.
  */
 public class Chronometer extends Thread {
@@ -12,39 +12,30 @@ public class Chronometer extends Thread {
     // temps restant en secondes
     private int value;
 
-    // la durée « officielle » (25 min par défaut)
     private int defaultMinutes = 25;
 
-    // true → décrémente, false → pause/stop
     private volatile boolean running = false;
 
-    // flag pour sortir proprement de run()
     private volatile boolean keepAlive = true;
 
-    // callback UI (appelé toutes les secondes via Platform.runLater)
     private Runnable onUpdate;
 
-    // pour ne déclencher l’alerte 15 min qu’une fois
     private int warned = 0;
 
-    /*---------------------------------------------------*/
-    /* setters                                           */
-    /*---------------------------------------------------*/
+
     public void setOnUpdate(Runnable r) { this.onUpdate = r; }
 
-    /*---------------------------------------------------*/
-    /* Boucle du thread                                  */
-    /*---------------------------------------------------*/
+
     @Override
     public void run() {
         while (keepAlive) {
             try {
                 Thread.sleep(1_000);               // chaque seconde
             } catch (InterruptedException stop) {
-                break;                              // on nous a réveillés : fin
+                break;
             }
 
-            if (!running) continue;                 // en pause ⇒ on boucle
+            if (!running) continue;
 
             value--;
 
@@ -68,9 +59,7 @@ public class Chronometer extends Thread {
         }
     }
 
-    /*---------------------------------------------------*/
-    /* API publique                                      */
-    /*---------------------------------------------------*/
+
     public synchronized void startChronometer(int minutes) {
         defaultMinutes = minutes;
         value          = minutes * 60;
@@ -82,7 +71,7 @@ public class Chronometer extends Thread {
         if (!isAlive()) start();
     }
 
-    /** met le chrono en pause et remet le compteur à 0 */
+
     public synchronized void stopChronometer() {
         running = false;
         value   = 0;

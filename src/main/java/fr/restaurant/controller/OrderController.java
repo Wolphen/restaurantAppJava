@@ -4,6 +4,7 @@ import fr.restaurant.model.Dish;
 import fr.restaurant.model.Order;
 import fr.restaurant.model.Table;
 import fr.restaurant.service.DishService;
+import fr.restaurant.service.TableService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -13,15 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -31,80 +24,102 @@ import java.util.stream.Collectors;
 
 public class OrderController {
 
-    @FXML public TableView<Order> orderTable;
-    @FXML public TableColumn<Order, Integer> tableCol;
-    @FXML public TableColumn<Order, String> platCol;
-    @FXML public TableColumn<Order, Float> priceCol;
-    @FXML public TableColumn<Order, String> statusCol;
-    @FXML public Button buttonAdd;
-    public TableColumn<Order, Void> deleteCol;
-    public TableColumn<Order, Void> doneCol;
+    private final TableService tableService = TableService.getInstance();
+    private final SqliteController db      = new SqliteController();
+
+    // liste observable pour la TableView
+    private final ObservableList<Order> orders =
+            FXCollections.observableArrayList();
+
+    @FXML public TableView<Order>    orderTable;
+    @FXML public TableColumn<Order,Integer> tableCol;
+    @FXML public TableColumn<Order,String>  platCol;
+    @FXML public TableColumn<Order,Integer> priceCol;
+    @FXML public TableColumn<Order,String>  statusCol;
+    @FXML public TableColumn<Order,Void>    deleteCol;
+    @FXML public TableColumn<Order,Void>    doneCol;
+    @FXML public Button                   buttonAdd;
+
+    // empêche les nouvelles commandes si time out
     public static boolean canOrder = true;
-
-    private final SqliteController db = new SqliteController();
-    private final ObservableList<Order> orders = FXCollections.observableArrayList(db.fetchOrder());
-
-    // Runnable pour mettre à jour le total
     private Runnable updateTotalPriceRunnable;
 
     @FXML
     private void initialize() {
-        tableCol.setCellValueFactory(cellData ->
-                new SimpleIntegerProperty(cellData.getValue().getTable()).asObject());
-        platCol.setCellValueFactory(cellData -> {
-            String dishNames = cellData.getValue().getDishes().stream()
+        // colonnes de la TableView
+        tableCol .setCellValueFactory(cd ->
+                new SimpleIntegerProperty(cd.getValue().getTable()).asObject());
+        platCol  .setCellValueFactory(cd -> {
+            String names = cd.getValue().getDishes().stream()
                     .map(Dish::getName)
                     .collect(Collectors.joining(", "));
-            return new SimpleStringProperty(dishNames);
+            return new SimpleStringProperty(names);
         });
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("globalPrice"));
+        priceCol .setCellValueFactory(cd ->
+                new SimpleIntegerProperty(cd.getValue().getGlobalPrice()).asObject());
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        orderTable.setItems(orders);
+        // boutons d’action
+        setupCancelColumn();
+        setupDoneColumn();
 
-        // Colonne pour annuler la commande
-        deleteCol.setCellFactory(col -> new TableCell<Order, Void>() {
+        // branche la liste et charge initialement
+        orderTable.setItems(orders);
+        refreshOrders();
+    }
+
+    /** relit toutes les commandes en base et rafraîchit la TableView */
+    private void refreshOrders() {
+        orders.setAll(db.fetchOrder());
+        orderTable.refresh();
+    }
+
+    /** colonne « Annuler » */
+    private void setupCancelColumn() {
+        deleteCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("Annuler");
             {
                 btn.setOnAction((ActionEvent e) -> {
-                    Order order = getTableView().getItems().get(getIndex());
-                    if ("en cours".equals(order.getStatus())) {
-                        db.cancelOrder(order.getId());
-                        order.setStatus("cancel");
-                        orderTable.refresh();
+                    Order o = getTableView().getItems().get(getIndex());
+                    if ("en cours".equalsIgnoreCase(o.getStatus())) {
+                        db.cancelOrder(o.getId());
+                        tableService.freeTable(o.getTable());
+                        refreshOrders();
                     }
                 });
             }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
+            @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || getIndex() >= getTableView().getItems().size() ||
-                        !"en cours".equals(getTableView().getItems().get(getIndex()).getStatus())) {
+                if (empty
+                        || getIndex() >= orders.size()
+                        || !"en cours".equalsIgnoreCase(orders.get(getIndex()).getStatus())) {
                     setGraphic(null);
                 } else {
                     setGraphic(btn);
                 }
             }
         });
+    }
 
-        // Colonne pour marquer la commande comme servie
-        doneCol.setCellFactory(col -> new TableCell<Order, Void>() {
+    /** colonne « Servi » */
+    private void setupDoneColumn() {
+        doneCol.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("Servi");
             {
                 btn.setOnAction((ActionEvent e) -> {
-                    Order order = getTableView().getItems().get(getIndex());
-                    if ("en cours".equals(order.getStatus())) {
-                        db.completeOrder(order.getId());
-                        order.setStatus("completed");
-                        orderTable.refresh();
+                    Order o = getTableView().getItems().get(getIndex());
+                    if ("en cours".equalsIgnoreCase(o.getStatus())) {
+                        db.completeOrder(o.getId());
+                        tableService.freeTable(o.getTable());
+                        refreshOrders();
                     }
                 });
             }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
+            @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || getIndex() >= getTableView().getItems().size() ||
-                        !"en cours".equals(getTableView().getItems().get(getIndex()).getStatus())) {
+                if (empty
+                        || getIndex() >= orders.size()
+                        || !"en cours".equalsIgnoreCase(orders.get(getIndex()).getStatus())) {
                     setGraphic(null);
                 } else {
                     setGraphic(btn);
@@ -113,20 +128,19 @@ public class OrderController {
         });
     }
 
+    /** bouton « Nouvelle commande » */
     @FXML
-    public void createOrder(){
+    public void createOrder() {
         if (canOrder) {
             openOrderDialog();
-        }else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur");
-            alert.setHeaderText("Impossible de créer une commande");
-            alert.setContentText("Heure de commande dépassé (15min) ");
-            alert.showAndWait();
+        } else {
+            new Alert(Alert.AlertType.ERROR,
+                    "Impossible de créer une commande\n" +
+                            "Temps de commande dépassé (15 min)").showAndWait();
         }
-
     }
 
+    /** fenêtre de création de commande */
     private void openOrderDialog() {
         Stage stage = new Stage();
         stage.setTitle("Créer une commande");
@@ -134,13 +148,14 @@ public class OrderController {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
 
-        // Sélection des tables disponibles non occupées
-        Label tableLabel = new Label("Sélectionnez une table disponible :");
+        // 1) combo pour les tables libres
         ComboBox<Table> tableCombo = new ComboBox<>();
         List<Table> freeTables = db.fetchTables().stream()
-                .filter(table -> !table.isOccupied())
+                .filter(t -> !t.isOccupied())
                 .collect(Collectors.toList());
         tableCombo.getItems().addAll(freeTables);
+
+        // personnalisation de l'affichage "Table X"
         tableCombo.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Table item, boolean empty) {
@@ -156,144 +171,135 @@ public class OrderController {
             }
         });
 
-        // Zone de recherche pour filtrer les plats
+        // 2) champ de recherche pour filtrer les plats
         TextField searchField = new TextField();
         searchField.setPromptText("Rechercher un plat");
 
-        // TableView pour la sélection des plats
-        Label dishLabel = new Label("Sélectionnez les plats :");
-        TableView<DishSelection> dishTable = new TableView<>();
-        ObservableList<DishSelection> dishSelections = FXCollections.observableArrayList();
-        DishService.getInstance().getObservableList().forEach(d -> dishSelections.add(new DishSelection(d)));
-        FilteredList<DishSelection> filteredDishes = new FilteredList<>(dishSelections, p -> true);
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            String query = newVal.trim().toLowerCase();
-            filteredDishes.setPredicate(ds -> ds.getDish().getName().toLowerCase().contains(query));
-        });
-        dishTable.setItems(filteredDishes);
+        // 3) tableau de sélection des plats (+ / - boutons)
+        TableView<DishSelection> dishTable = buildDishSelectionTable(searchField);
 
-        TableColumn<DishSelection, String> nameCol = new TableColumn<>("Plat");
-        nameCol.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getDish().getName()));
-
-        TableColumn<DishSelection, Number> qtyCol = new TableColumn<>("Quantité");
-        qtyCol.setCellValueFactory(cellData -> cellData.getValue().quantityProperty());
-
-        TableColumn<DishSelection, Void> minusCol = new TableColumn<>("Retirer");
-        minusCol.setCellFactory(col -> new TableCell<>() {
-            private final Button btn = new Button("-");
-            {
-                btn.setOnAction((ActionEvent event) -> {
-                    DishSelection ds = getTableView().getItems().get(getIndex());
-                    if (ds.getQuantity() > 0) {
-                        ds.setQuantity(ds.getQuantity() - 1);
-                        updateTotalPrice();
-                    }
-                });
-            }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
-            }
-        });
-
-        TableColumn<DishSelection, Void> plusCol = new TableColumn<>("Ajouter");
-        plusCol.setCellFactory(col -> new TableCell<>() {
-            private final Button btn = new Button("+");
-            {
-                btn.setOnAction((ActionEvent event) -> {
-                    DishSelection ds = getTableView().getItems().get(getIndex());
-                    ds.setQuantity(ds.getQuantity() + 1);
-                    updateTotalPrice();
-                });
-            }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
-            }
-        });
-
-        dishTable.getColumns().addAll(nameCol, minusCol, qtyCol, plusCol);
-        dishTable.setPrefHeight(200);
-
-        // Libellé affichant le prix total cumulé
+        // 4) label du total
         Label totalPriceLabel = new Label("Total : 0 €");
-
         updateTotalPriceRunnable = () -> {
-            int total = dishSelections.stream()
-                    .mapToInt(ds -> (int) (ds.getDish().getPrice() * ds.getQuantity()))
+            double sum = dishTable.getItems().stream()
+                    .mapToDouble(ds -> ds.getDish().getPrice() * ds.getQuantity())
                     .sum();
-            totalPriceLabel.setText("Total : " + total + " €");
+            totalPriceLabel.setText("Total : " + (int) sum + " €");
         };
 
-        Button confirmBtn = new Button("Confirmer la commande");
-        confirmBtn.setOnAction(e -> {
-            Table selectedTable = tableCombo.getSelectionModel().getSelectedItem();
-            if (selectedTable == null) {
+        // 5) bouton Confirmer
+        Button confirm = new Button("Confirmer la commande");
+        confirm.setOnAction(e -> {
+            Table selected = tableCombo.getValue();
+            if (selected == null) {
                 new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner une table.").showAndWait();
                 return;
             }
-            List<Dish> selectedDishes = dishSelections.stream()
-                    .filter(ds -> ds.getQuantity() > 0)
-                    .flatMap(ds -> java.util.stream.Stream.generate(ds::getDish).limit(ds.getQuantity()))
+
+            List<Dish> chosen = dishTable.getItems().stream()
+                    .flatMap(ds -> java.util.stream.Stream.generate(ds::getDish)
+                            .limit(ds.getQuantity()))
                     .collect(Collectors.toList());
-            if (selectedDishes.isEmpty()) {
+            if (chosen.isEmpty()) {
                 new Alert(Alert.AlertType.ERROR, "Veuillez sélectionner au moins un plat.").showAndWait();
                 return;
             }
-            int globalPrice = selectedDishes.stream()
-                    .mapToInt(d -> (int) d.getPrice())
+
+            // on calcule le total en sommant en double puis on cast en int
+            double sum = chosen.stream()
+                    .mapToDouble(Dish::getPrice)
                     .sum();
-            db.updateTableStatus(selectedTable.getId(), true);
-            Order order = new Order(selectedTable.getId(), globalPrice, "en cours", selectedDishes);
-            db.addOrder(order, selectedDishes);
-            orders.add(order);
+            int total = (int) sum;
+
+            Order order = new Order(selected.getId(), total, "en cours", chosen);
+
+            db.addOrder(order, chosen);                  // insertion en BDD
+            tableService.assignTable(selected.getId());  // réserve la table
+            refreshOrders();                             // rafraîchit la TableView
+
             stage.close();
         });
 
-        root.getChildren().addAll(tableLabel, tableCombo, searchField, dishLabel, dishTable, totalPriceLabel, confirmBtn);
-        stage.setScene(new Scene(root));
+        // assemble la vue
+        root.getChildren().addAll(
+                new Label("Table :"), tableCombo,
+                new Label("Plats :"), searchField, dishTable,
+                totalPriceLabel, confirm
+        );
+
+        stage.setScene(new Scene(root, 400, 500));
         stage.showAndWait();
     }
 
-    private void updateTotalPrice() {
-        if (updateTotalPriceRunnable != null) {
-            updateTotalPriceRunnable.run();
-        }
+
+
+    /** construit le TableView des plats avec +/- et filtre */
+    private TableView<DishSelection> buildDishSelectionTable(TextField searchField) {
+        ObservableList<DishSelection> list = FXCollections.observableArrayList();
+        DishService.getInstance().getObservableList()
+                .forEach(d -> list.add(new DishSelection(d)));
+        FilteredList<DishSelection> filtered =
+                new FilteredList<>(list, ds -> true);
+        searchField.textProperty().addListener((obs, o, n) -> {
+            String q = n.toLowerCase().trim();
+            filtered.setPredicate(ds ->
+                    ds.getDish().getName().toLowerCase().contains(q));
+        });
+
+        TableView<DishSelection> tv = new TableView<>(filtered);
+        TableColumn<DishSelection,String> nameCol = new TableColumn<>("Plat");
+        nameCol.setCellValueFactory(cd ->
+                new SimpleStringProperty(cd.getValue().getDish().getName()));
+
+        TableColumn<DishSelection,Void> minusCol = new TableColumn<>("-");
+        minusCol.setCellFactory(c -> new TableCell<>() {
+            private final Button b = new Button("-");
+            { b.setOnAction(e -> {
+                DishSelection ds = getTableView().getItems().get(getIndex());
+                if (ds.getQuantity() > 0) {
+                    ds.setQuantity(ds.getQuantity() - 1);
+                    updateTotalPriceRunnable.run();
+                }
+            });}
+            @Override protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                setGraphic(empty ? null : b);
+            }
+        });
+
+        TableColumn<DishSelection,Number> qtyCol = new TableColumn<>("Qté");
+        qtyCol.setCellValueFactory(cd -> cd.getValue().quantityProperty());
+
+        TableColumn<DishSelection,Void> plusCol = new TableColumn<>("+");
+        plusCol.setCellFactory(c -> new TableCell<>() {
+            private final Button b = new Button("+");
+            { b.setOnAction(e -> {
+                DishSelection ds = getTableView().getItems().get(getIndex());
+                ds.setQuantity(ds.getQuantity() + 1);
+                updateTotalPriceRunnable.run();
+            });}
+            @Override protected void updateItem(Void v, boolean empty) {
+                super.updateItem(v, empty);
+                setGraphic(empty ? null : b);
+            }
+        });
+
+        tv.getColumns().addAll(nameCol, minusCol, qtyCol, plusCol);
+        tv.setPrefHeight(200);
+        return tv;
     }
 
-    public class DishSelection {
+    /** wrapper plat + quantité */
+    public static class DishSelection {
         private final Dish dish;
         private final SimpleIntegerProperty quantity = new SimpleIntegerProperty(0);
-
-        public DishSelection(Dish dish) {
-            this.dish = dish;
-        }
-
-        public Dish getDish() {
-            return dish;
-        }
-
-        public int getQuantity() {
-            return quantity.get();
-        }
-
-        public void setQuantity(int qty) {
-            quantity.set(qty);
-        }
-
-        public SimpleIntegerProperty quantityProperty() {
-            return quantity;
-        }
+        public DishSelection(Dish dish) { this.dish = dish; }
+        public Dish getDish() { return dish; }
+        public int getQuantity() { return quantity.get(); }
+        public void setQuantity(int q) { quantity.set(q); }
+        public SimpleIntegerProperty quantityProperty() { return quantity; }
     }
 
-    public static void cantOrder(){
-        canOrder = false;
-
-    }
-    public static void canOrder(){
-        canOrder = true;
-    }
+    public static void cantOrder() { canOrder = false; }
+    public static void canOrder() { canOrder = true; }
 }
