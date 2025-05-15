@@ -45,10 +45,7 @@ public class DashboardController {
     @FXML
     private void initialize() {
         // charger les données
-        loadLastFive();
-        loadPending();
-        loadStats();
-        loadBills();
+        refresh();
 
         // formater affichage des commandes
         lastOrdersList.setCellFactory(lv -> new ListCell<>() {
@@ -64,6 +61,12 @@ public class DashboardController {
         return "Cmd #" + o.getId()
                 + " – " + o.getGlobalPrice() + "€"
                 + " – " + o.getStatus();
+    }
+    public void refresh() {
+        loadLastFive();
+        loadPending();
+        loadStats();
+        loadBills();
     }
 
     private void loadLastFive() {
@@ -105,9 +108,9 @@ public class DashboardController {
         long u30    = emps.stream().filter(e -> e.getAge() < 30).count();
         long _30_45 = emps.stream().filter(e -> e.getAge() >= 30 && e.getAge() <= 45).count();
         long o45    = emps.stream().filter(e -> e.getAge() > 45).count();
-        empUnder30Label.setText("Employés < 30 ans : " + u30);
+        empUnder30Label.setText("Employés - 30 ans : " + u30);
         emp30to45Label .setText("Employés 30–45 ans : " + _30_45);
-        empOver45Label .setText("Employés > 45 ans : " + o45);
+        empOver45Label .setText("Employés + 45 ans : " + o45);
 
         // valeur totale de la carte
         double total = menu.stream().mapToDouble(Dish::getPrice).sum();

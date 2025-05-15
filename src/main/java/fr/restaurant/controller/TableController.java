@@ -32,6 +32,8 @@ public class TableController {
     // singleton pour bien partager l’état
     private final TableService service = TableService.getInstance();
 
+
+
     @FXML
     private void initialize() {
         // bind des colonnes → propriétés

@@ -41,6 +41,7 @@ public class RootController {
         System.out.println(" Ouverture onglet Dashboard");
         var url = getClass().getResource("/fr/restaurant/view/EmployeeView.fxml");
         System.out.println("URL Employee = " + url);
+        dashboardTab.setContent(null);
 
 
         if (url == null) {
@@ -92,6 +93,7 @@ public class RootController {
             System.err.println(">> FXML introuvable : vérifie l’emplacement !");
             return;
         }
+        tablesTab.setContent(null);
 
         selectAndLoad(tablesTab, "/fr/restaurant/view/TableView.fxml");
     }

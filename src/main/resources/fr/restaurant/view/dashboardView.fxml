@@ -8,7 +8,7 @@
           fx:controller="fr.restaurant.controller.DashboardController"
           hgap="20" vgap="20">
 
-    <!-- padding à 20 px tout autour -->
+    <!-- padding à 20 px tout autour pour le swag -->
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
@@ -30,9 +30,9 @@
         <Label text="Stats menu et employés" styleClass="tabTitle"/>
         <Label fx:id="maxDishLabel"    text="Plat le + cher : "/>
         <Label fx:id="minDishLabel"    text="Plat le – cher : "/>
-        <Label fx:id="empUnder30Label" text="Employés  30 ans : "/>
+        <Label fx:id="empUnder30Label" text="Employés - 30 ans : "/>
         <Label fx:id="emp30to45Label"  text="Employés 30–45 ans : "/>
-        <Label fx:id="empOver45Label"  text="Employés  45 ans : "/>
+        <Label fx:id="empOver45Label"  text="Employés + 45 ans : "/>
         <Label fx:id="totalMenuLabel"  text="Valeur totale de la carte : "/>
     </VBox>
 
