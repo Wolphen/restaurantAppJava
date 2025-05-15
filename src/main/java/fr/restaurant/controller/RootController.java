@@ -31,6 +31,7 @@ public class RootController {
     @FXML
     private void initialize() {
         mainTabPane.setTabMaxHeight(0);
+        openDashboard();
     }
 
 
@@ -38,7 +39,14 @@ public class RootController {
     @FXML
     private void openDashboard() {
         System.out.println(" Ouverture onglet Dashboard");
+        var url = getClass().getResource("/fr/restaurant/view/EmployeeView.fxml");
+        System.out.println("URL Employee = " + url);
 
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
         selectAndLoad(dashboardTab, "/fr/restaurant/view/DashboardView.fxml");
     }
 
@@ -61,6 +69,14 @@ public class RootController {
     @FXML
     private void openOrders() {
         System.out.println(" Ouverture onglet Order");
+        var url = getClass().getResource("/fr/restaurant/view/OrderView.fxml");
+        System.out.println("URL DishView = " + url);
+
+
+        if (url == null) {
+            System.err.println(">> FXML introuvable : vérifie l’emplacement !");
+            return;
+        }
 
         selectAndLoad(ordersTab, "/fr/restaurant/view/OrderView.fxml");
     }
@@ -68,7 +84,7 @@ public class RootController {
     @FXML
     private void openTables() {
         System.out.println(" Ouverture onglet Tables");
-        var url = getClass().getResource("/fr/restaurant/view/DishView.fxml");
+        var url = getClass().getResource("/fr/restaurant/view/TableView.fxml");
         System.out.println("URL DishView = " + url);
 
 
@@ -127,31 +143,20 @@ public class RootController {
     @FXML
     private void onStartChronometer() {
 
-        if (currentChrono != null && currentChrono.isAlive()) {
-            currentChrono.interrupt();          // coupe le thread en douceur
-        }
-
-        // nouveau chrono
-        currentChrono = new Chronometer();
-
-        currentChrono.setOnUpdate(() -> {
-            int total   = currentChrono.getValue();     // secondes restantes
-            int minutes = total / 60;
-            int seconds = total % 60;
-
+        Chronometer chronometer = new Chronometer();
+        chronometer.setOnUpdate(() -> {
+            int totalSeconds = chronometer.getValue();
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
             timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
 
-            // un peu de style selon le temps restant
-            if (total == 0) {
-                timerLabel.getStyleClass().setAll("timer", "finished");
-            } else if (total <= 60) {
-                timerLabel.getStyleClass().setAll("timer", "danger");
+            // Détection si moins de 15 minutes restantes
+            if (totalSeconds <= 15 * 60) {
+                timerLabel.setStyle("-fx-text-fill: red;");
             } else {
-                timerLabel.getStyleClass().setAll("timer", "running");
+                timerLabel.setStyle("-fx-text-fill: black;");
             }
-        });
 
-        timerLabel.getStyleClass().setAll("timer", "running");
-        currentChrono.startChronometer(25);            // 25 min par défaut
-    }
+        });
+        chronometer.startChronometer(15);}
 }

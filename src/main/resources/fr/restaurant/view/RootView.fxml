@@ -41,28 +41,16 @@
             <tabs>
 
                 <!-- Dashboard -->
-                <Tab fx:id="dashboardTab" text="Dashboard" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Dashboard" styleClass="tabTitle"/>
-                            <Label text="Vue synthèse : stats et files d’attente."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="dashboardTab" text="Dashboard" closable="false"/>
+
 
                 <!-- Plats -->
                 <Tab fx:id="dishesTab" text="Plats" closable="false"/>
 
 
                 <!-- Commandes -->
-                <Tab fx:id="ordersTab" text="Commandes" closable="false">
-                    <content>
-                        <VBox alignment="CENTER" spacing="12">
-                            <Label text="Commandes" styleClass="tabTitle"/>
-                            <Label text="Suivi et préparation des commandes."/>
-                        </VBox>
-                    </content>
-                </Tab>
+                <Tab fx:id="ordersTab" text="Commandes" closable="false"/>
+
 
                 <!-- Tables -->
                 <Tab fx:id="tablesTab" text="Tables" closable="false"/>

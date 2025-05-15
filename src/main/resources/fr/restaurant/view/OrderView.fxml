@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.restaurant.controller.OrderController">
+
+    <Label styleClass="tabTitle" text="Gestion des commandes" />
+
+    <TableView fx:id="orderTable" prefHeight="330">
+        <columns>
+            <TableColumn fx:id="tableCol" text="Table" prefWidth="60" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="platCol" text="Plats" prefWidth="220" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="priceCol" text="Prix total" prefWidth="70" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="statusCol" text="Statut" prefWidth="100" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="deleteCol" text="Supprimer" prefWidth="100" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="doneCol" text="Terminer" prefWidth="100" style="-fx-alignment: CENTER;"/>
+        </columns>
+    </TableView>
+    <HBox spacing="8">
+        <Button fx:id="buttonAdd" onAction="#createOrder" text="Crée une nouvelle commande" />
+    </HBox>
+</VBox>
