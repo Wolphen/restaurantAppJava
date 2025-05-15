@@ -27,6 +27,7 @@ public class Main extends Application {
         // création des tables
         SqliteController bdd = new SqliteController();
         bdd.creationTable();
+        System.out.println("Hello depuis la console !");
 
         launch(args);
     }

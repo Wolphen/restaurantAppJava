@@ -8,13 +8,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class SqliteController {
 
     // La base vit ici. Si sa bouge, sa suit.
     private static final String URI = "jdbc:sqlite:sample.db";
 
+    interface Finances {
+        Date dates = new Date();
+        int recette = 0;
+    }
     // ------------------------------------------------------------------
     // Boot de la base : on crée tout si ça n’existe pas
     // ------------------------------------------------------------------
@@ -377,6 +383,21 @@ public class SqliteController {
             System.out.println("Commande " + orderId + " annulée (lignes affectées : " + rowsAffected + ")");
         } catch (SQLException boom) {
             boom.printStackTrace(System.err);
+        }
+    }
+
+    public ObservableList<Map.Entry<Integer, Date>> fetchGlobalPricesDishes() {
+        String sql = "select globalPrice, dateAdded from orders where status = 'completed'";
+        try (Connection c = DriverManager.getConnection(URI); PreparedStatement ps = c.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            var list = FXCollections.<Map.Entry<Integer, Date>>observableArrayList();
+            while (rs.next()) {
+                list.add(Map.entry(rs.getInt("globalPrice"), rs.getDate("dateAdded")));
+            }
+            return list;
+        }catch (SQLException e){
+            e.printStackTrace(System.err);
+            return null;
         }
     }
 }
